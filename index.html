@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -316,11 +316,13 @@
   /* ── PDF styles (injected) ── */
   #pdf-frame { display: none; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
  
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+<div id="qr-generator" style="display:none"></div>
  
 <!-- ══════ SCREEN 1: INTRO ══════ -->
 <div class="screen active" id="screen-intro">
@@ -1093,6 +1095,27 @@ function generatePDF(){
   const positive = state.verdict==='POZYTYWNY';
   const dur = Math.round(((m.tsEnd||Date.now()) - m.tsStart)/60000);
  
+  // Generuj QR jako dataURL w głównym dokumencie
+  const qrText = [
+    'DRIVETAB EGZAMIN',
+    'Kandydat: '+m.kandydat,
+    'PKK: '+m.pkk,
+    'Data: '+m.data+' '+m.godzina,
+    'Egzaminator: '+m.egzaminator,
+    'Nr: '+m.nrEg,
+    'WORD: '+m.word,
+    'Pojazd: '+m.pojazd,
+    'Wynik: '+state.verdict,
+    'HP: '+(state.hp.done ? state.hp.clips.reduce((s,cl)=>s+cl.hits.reduce((mx,h)=>h.pts>mx?h.pts:mx,0),0)+'/25' : 'brak')
+  ].join('\n');
+  const qrDiv = document.getElementById('qr-generator');
+  qrDiv.innerHTML = '';
+  new QRCode(qrDiv, {text: qrText, width:90, height:90, colorDark:'#000', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.M});
+  const qrImg = qrDiv.querySelector('img') || qrDiv.querySelector('canvas');
+  let qrDataUrl = '';
+  if(qrImg && qrImg.tagName==='IMG') qrDataUrl = qrImg.src;
+  else if(qrImg && qrImg.tagName==='CANVAS') qrDataUrl = qrImg.toDataURL();
+ 
   // Helper: ocena zadania → symbole 1□ 2□ □
   function ocena(id){
     const s = state.plac[id] || {count:0,done:false};
@@ -1326,7 +1349,11 @@ function generatePDF(){
           HP: ${hpPts !== null ? hpPts+'/25 pkt' : 'nie przeprowadzono'}
         </div>
       </div>
-      <canvas id="qr-canvas" width="80" height="80" style="margin:0 8px;flex-shrink:0"></canvas>
+ 
+      <div style="display:flex;flex-direction:column;align-items:center;margin:0 8px">
+        <img src="${qrDataUrl}" width="80" height="80" style="display:block">
+        <div style="font-size:5pt;color:#555;text-align:center;margin-top:1px">Kod QR</div>
+      </div>
       <div class="wynik-val">${state.verdict}</div>
     </div>
  
@@ -1347,56 +1374,6 @@ function generatePDF(){
   Wynik potwierdzony: kwalifikowanym podpisem elektronicznym / podpisem osobistym / podpisem zaufanym &nbsp;|&nbsp;
   DriveTab v1.0 &nbsp;|&nbsp; ${new Date().toLocaleString('pl-PL')}
 </div>
- 
-<scr'+'ipt>
-// Minimalny generator QR Code (wersja 2, ECL M) — bez zewnętrznych bibliotek
-(function(){
-  var cv = document.getElementById('qr-canvas');
-  if(!cv) return;
-  // Dane do zakodowania
-  var text = 'DRIVETAB|${m.kandydat}|PKK:${m.pkk}|${m.data} ${m.godzina}|Egz:${m.egzaminator}|WORD:${m.word}|${state.verdict}|HP:${hpPts!==null?hpPts+"/25":"brak"}';
-  // Użyj QRious — inline przez data URI
-  // Ponieważ nie możemy ładować bibliotek inline, rysujemy kod kreskowy 1D + dane
-  // jako czytelny "mini-arkusz" w miejscu QR
-  var ctx = cv.getContext('2d');
-  var W = cv.width, H = cv.height;
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle = '#000';
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(1,1,W-2,H-2);
-  // Narysuj wzór pseudo-QR z hash tekstu
-  var hash = 0;
-  for(var i=0;i<text.length;i++) hash = ((hash<<5)-hash)+text.charCodeAt(i);
-  hash = Math.abs(hash);
-  var cells = 21;
-  var cell = Math.floor((W-4)/cells);
-  ctx.fillStyle = '#000';
-  // Wzorce lokalizacyjne (narożniki)
-  [[0,0],[0,14],[14,0]].forEach(function(p){
-    var x=p[0]*cell+2, y=p[1]*cell+2;
-    ctx.fillRect(x,y,7*cell,7*cell);
-    ctx.fillStyle='#fff';
-    ctx.fillRect(x+cell,y+cell,5*cell,5*cell);
-    ctx.fillStyle='#000';
-    ctx.fillRect(x+2*cell,y+2*cell,3*cell,3*cell);
-    ctx.fillStyle='#000';
-  });
-  // Wypełnij komórki danych na podstawie hash
-  var seed = hash;
-  for(var r=0;r<cells;r++){
-    for(var cc2=0;cc2<cells;cc2++){
-      // Pomiń wzorce lokalizacyjne
-      if((r<8&&cc2<8)||(r<8&&cc2>12)||(r>12&&cc2<8)) continue;
-      seed = (seed * 1664525 + 1013904223) & 0xffffffff;
-      if(seed & 1){
-        ctx.fillStyle='#000';
-        ctx.fillRect(cc2*cell+2, r*cell+2, cell, cell);
-      }
-    }
-  }
-})();
-<\/scr'+'ipt>
  
 `;
  
