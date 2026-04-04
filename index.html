@@ -685,7 +685,7 @@ function loadHPClip(idx){
   placeholder.style.display = 'flex';
   video.style.display = 'none';
  
-  video.src = './hp/' + clip.file;
+  video.src = './' + clip.file;
   video.load();
  
   document.getElementById('hp-clip-info').textContent = `⏳ Ładowanie: ${clip.name}`;
