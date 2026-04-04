@@ -346,11 +346,11 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="form-row" style="margin:0">
         <label>Data egzaminu</label>
-        <input id="f-data" type="date">
+        <input id="f-data" type="text" placeholder="DD.MM.RRRR" inputmode="numeric" maxlength="10">
       </div>
       <div class="form-row" style="margin:0">
         <label>Godzina</label>
-        <input id="f-godzina" type="time">
+        <input id="f-godzina" type="text" placeholder="GG:MM" inputmode="numeric" maxlength="5">
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -599,7 +599,11 @@ function toast(msg, dur=2200){
 }
  
 function todayISO(){
-  return new Date().toISOString().slice(0,10);
+  const d = new Date();
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const yyyy = d.getFullYear();
+  return dd+'.'+mm+'.'+yyyy;
 }
 function nowHM(){
   const d=new Date(); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
@@ -610,6 +614,21 @@ function nowHM(){
 // ═══════════════════════════════════════════════════════════
 document.getElementById('f-data').value = todayISO();
 document.getElementById('f-godzina').value = nowHM();
+ 
+// Auto-format daty DD.MM.YYYY podczas pisania
+document.getElementById('f-data').addEventListener('input', function(){
+  let v = this.value.replace(/\D/g,'');
+  if(v.length>2) v = v.slice(0,2)+'.'+v.slice(2);
+  if(v.length>5) v = v.slice(0,5)+'.'+v.slice(5,9);
+  this.value = v;
+});
+ 
+// Auto-format godziny GG:MM podczas pisania
+document.getElementById('f-godzina').addEventListener('input', function(){
+  let v = this.value.replace(/\D/g,'');
+  if(v.length>2) v = v.slice(0,2)+':'+v.slice(2,4);
+  this.value = v;
+});
  
 function startEgzamin(){
   const k = document.getElementById('f-kandydat').value.trim();
@@ -1338,4 +1357,3 @@ function nowyEgzamin(){
 </script>
 </body>
 </html>
- 
