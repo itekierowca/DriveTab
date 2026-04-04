@@ -1,3 +1,6 @@
+
+Copy
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -1336,13 +1339,47 @@ function generatePDF(){
   </div>
 </div>
  
-<!-- STOPKA -->
-<div class="footer">
-  Nr PKK: ${m.pkk} &nbsp;|&nbsp;
-  Arkusz elektroniczny — Rozp. MI z dn. 24.11.2023 r. (Dz.U. poz. 2659) § 28 ust. 1 pkt 7 &nbsp;|&nbsp;
-  Wynik potwierdzony: kwalifikowanym podpisem elektronicznym / podpisem osobistym / podpisem zaufanym &nbsp;|&nbsp;
-  DriveTab v1.0 &nbsp;|&nbsp; ${new Date().toLocaleString('pl-PL')}
+<!-- QR + STOPKA -->
+<div style="display:flex;align-items:flex-start;gap:12px;margin-top:8px;border-top:1px solid #ccc;padding-top:6px">
+  <div>
+    <div id="qr-canvas" style="width:90px;height:90px"></div>
+    <div style="font-size:5.5pt;color:#888;text-align:center;margin-top:2px">Kod QR egzaminu</div>
+  </div>
+  <div class="footer" style="flex:1;border-top:none;padding-top:0;margin-top:0">
+    <b>Nr PKK:</b> ${m.pkk}<br>
+    <b>Kandydat:</b> ${m.kandydat}<br>
+    <b>Egzaminator:</b> ${m.egzaminator} | Nr: ${m.nrEg}<br>
+    <b>Data:</b> ${m.data} ${m.godzina} | <b>WORD:</b> ${m.word}<br>
+    <b>Pojazd:</b> ${m.pojazd}<br>
+    <b>Wynik HP:</b> ${hpPts !== null ? hpPts+'/25 pkt' : 'nie przeprowadzono'}<br>
+    Arkusz elektroniczny — Rozp. MI z dn. 24.11.2023 r. (Dz.U. poz. 2659) § 28 ust. 1 pkt 7<br>
+    DriveTab v1.0 | ${new Date().toLocaleString('pl-PL')}
+  </div>
 </div>
+ 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  window.onload = function(){
+    var qrData = 'DRIVETAB\n'
+      + 'Kandydat: ${m.kandydat}\n'
+      + 'PKK: ${m.pkk}\n'
+      + 'Data: ${m.data} ${m.godzina}\n'
+      + 'Egzaminator: ${m.egzaminator}\n'
+      + 'Nr: ${m.nrEg}\n'
+      + 'WORD: ${m.word}\n'
+      + 'Pojazd: ${m.pojazd}\n'
+      + 'Wynik: ${state.verdict}\n'
+      + 'HP: ${hpPts !== null ? hpPts+"/25" : "brak"}';
+    new QRCode(document.getElementById('qr-canvas'), {
+      text: qrData,
+      width: 90,
+      height: 90,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  };
+<\/script>
  
 </body></html>`;
  
