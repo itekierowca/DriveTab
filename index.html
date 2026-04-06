@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -79,7 +79,7 @@
   .legal { font-size: .68rem; color: var(--muted); margin-top: 14px; text-align: center; line-height: 1.5; }
  
   /* ── HP PHASE ── */
-  #screen-hp { background: #000; }
+  #screen-hp { background: #000; height: 100vh; }
   .hp-header {
     background: rgba(0,0,0,.8); border-bottom: 1px solid #1a1a1a;
     padding: 12px 20px; display: flex; align-items: center; gap: 14px;
@@ -87,11 +87,12 @@
   .hp-counter { font-family: var(--mono); font-size: .85rem; color: var(--muted); margin-left: auto; }
   .hp-progress { height: 3px; background: #1a1a1a; position: relative; }
   .hp-progress-bar { height: 100%; background: var(--accent); transition: width .3s; }
-  #hp-video { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:#000; }
+  #hp-video { width:100%; height:100%; object-fit:contain; background:#000; display:block; }
   .hp-video-area {
     flex: 1; display: flex; align-items: center; justify-content: center;
     position: relative; background: #000; cursor: pointer;
-    user-select: none;
+    user-select: none; overflow: hidden;
+    min-height: 200px;
   }
   .hp-placeholder {
     display: flex; flex-direction: column; align-items: center; gap: 16px;
@@ -442,7 +443,7 @@
  
     <!-- Odtwarzacz wideo -->
     <video id="hp-video"
-      style="position:absolute;top:0;left:0;width:100%;height:100%;display:none;pointer-events:none;background:#000"
+      style="width:100%;height:100%;object-fit:contain;display:none;pointer-events:none;background:#000"
       playsinline webkit-playsinline preload="auto" x-webkit-airplay="allow">
     </video>
  
@@ -780,15 +781,23 @@ function loadHPClip(idx){
  
   video.src = './' + clip.file;
   video.load();
+  video.onloadstart = () => {
+    console.log('HP loadstart:', video.src);
+    document.getElementById('hp-placeholder-msg').textContent = `Ładowanie: ${clip.file}…`;
+  };
+  video.onstalled = () => {
+    console.warn('HP video stalled');
+    document.getElementById('hp-clip-info').textContent = '⚠ Wideo zatrzymane — sprawdź połączenie';
+  };
  
   document.getElementById('hp-clip-info').textContent = `⏳ Ładowanie: ${clip.name}`;
+  console.log('HP video src:', video.src);
+  console.log('HP video readyState:', video.readyState);
+  console.log('HP video networkState:', video.networkState);
  
   video.oncanplay = () => {
     placeholder.style.display = 'none';
     video.style.display = 'block';
-    // Wymuś wymiary wideo na iOS
-    video.style.width  = '100%';
-    video.style.height = '100%';
     hpMaxSec = video.duration || clip.winEnd + 10;
     document.getElementById('hp-clip-info').textContent =
       `▶ ${clip.name} — DOTKNIJ gdy widzisz zagrożenie`;
