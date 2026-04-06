@@ -8,7 +8,7 @@
 <title>DriveTab — Arkusz Egzaminu kat. B</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700;800&display=swap');
- 
+
   :root {
     --bg:       #0f1923;
     --surface:  #1a2535;
@@ -25,16 +25,16 @@
     --font:     'Sora', sans-serif;
     --mono:     'JetBrains Mono', monospace;
   }
- 
+
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { width: 100%; min-height: 100vh; background: var(--bg); color: var(--text); font-family: var(--font); }
- 
+
   /* ── SCREENS ── */
   .screen { display: none; flex-direction: column;
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .screen.active { display: flex; }
- 
+
   /* ── HEADER ── */
   .hdr {
     background: var(--surface);
@@ -46,7 +46,7 @@
   .hdr-logo { font-family: var(--mono); font-weight: 700; font-size: 1.1rem; color: var(--accent); letter-spacing: 1px; }
   .hdr-sub { font-size: .75rem; color: var(--muted); margin-left: auto; }
   .badge { background: var(--accent); color: #000; font-size: .65rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: var(--mono); }
- 
+
   /* ── INTRO ── */
   #screen-intro {
     align-items: center; justify-content: center;
@@ -79,7 +79,7 @@
   }
   .btn-start:active { transform: scale(.97); }
   .legal { font-size: .68rem; color: var(--muted); margin-top: 14px; text-align: center; line-height: 1.5; }
- 
+
   /* ── HP PHASE ── */
   #screen-hp { background: #000; }
   .hp-header {
@@ -121,7 +121,7 @@
     border-radius: 8px; padding: 5px 10px;
     font-family: var(--mono); font-size: .75rem; color: var(--ok);
   }
- 
+
   .hp-result-banner {
     position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
     background: rgba(0,0,0,.92); border: 2px solid var(--ok);
@@ -130,7 +130,7 @@
   }
   .hp-result-banner h2 { font-size: 1.4rem; color: var(--ok); margin-bottom: 8px; }
   .hp-result-banner p { color: var(--muted); font-size: .85rem; }
- 
+
   /* ── MANEWRY PHASE ── */
   #screen-manewry { overflow-y: auto; }
   .section { padding: 12px 12px 6px; }
@@ -140,7 +140,7 @@
     display: flex; align-items: center; gap: 8px;
   }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
- 
+
   /* Przygotowanie */
   .prep-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
   .prep-item {
@@ -152,7 +152,7 @@
   .prep-item.done { border-color: var(--ok); background: rgba(46,213,115,.07); }
   .prep-item.done .prep-item-label { color: var(--ok); }
   .prep-item-label { font-size: .88rem; line-height: 1.3; flex: 1; }
- 
+
   /* Zadania plac */
   .task-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
@@ -191,7 +191,7 @@
   .t-btn.w.active { background: var(--warn); color: #000; border-color: var(--warn); }
   .t-btn.f { background: rgba(255,71,87,.1); color: var(--danger); border: 1px solid rgba(255,71,87,.3); }
   .t-btn.f.active { background: var(--danger); color: #fff; border-color: var(--danger); }
- 
+
   /* Ruch drogowy — błędy */
   .err-grid { display: grid; gap: 8px; }
   .is-tablet .err-grid { grid-template-columns: 1fr 1fr; }
@@ -238,7 +238,7 @@
   .inc-btn.plus { background: rgba(255,71,87,.15); color: var(--danger); }
   .inc-btn.plus:active { background: var(--danger); color: #fff; }
   .inc-btn.minus { background: var(--surface2); color: var(--muted); }
- 
+
   /* Sticky STOP/NEXT bar */
   .sticky-bar {
     position: sticky; bottom: 0; z-index: 40;
@@ -262,7 +262,7 @@
   .btn-primary:disabled { opacity: .35; cursor: default; }
   .phase-label { font-size: .7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
   .phase-status { font-family: var(--mono); font-size: .8rem; }
- 
+
   /* ── WYNIK ── */
   #screen-wynik { overflow-y: auto; padding-bottom: 40px; }
   .wynik-hero {
@@ -303,7 +303,7 @@
     font-size: .9rem; cursor: pointer;
     text-align: center;
   }
- 
+
   /* ── HP summary chip ── */
   .hp-summary-chip {
     display: inline-flex; align-items: center; gap: 6px;
@@ -312,7 +312,7 @@
     font-family: var(--mono); color: var(--accent);
     margin: 0 auto 16px; width: fit-content;
   }
- 
+
   /* ── Toast ── */
   .toast {
     position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
@@ -321,17 +321,17 @@
     opacity: 0; pointer-events: none; transition: all .3s; white-space: nowrap;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
- 
+
   /* ── PDF styles (injected) ── */
   #pdf-frame { display: none; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 </head>
 <body>
- 
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
- 
+
 <!-- ══ SKANER QR ══ -->
 <div id="qr-scanner-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:200;flex-direction:column;align-items:center;justify-content:center">
   <div style="color:var(--accent);font-family:var(--mono);font-size:.9rem;margin-bottom:16px;letter-spacing:1px">SKANUJ KOD QR KANDYDATA</div>
@@ -352,7 +352,7 @@
   <button onclick="closeScannerQR()" style="margin-top:20px;padding:12px 32px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--font);font-size:.9rem;cursor:pointer">✕ Anuluj</button>
 </div>
 <div id="qr-generator" style="display:none"></div>
- 
+
 <!-- ══════ SCREEN 1: INTRO ══════ -->
 <div class="screen active" id="screen-intro">
   <div class="intro-card">
@@ -365,12 +365,14 @@
         <div class="subtitle">Elektroniczny arkusz egzaminu · kat. B</div>
       </div>
     </div>
- 
+
     <div class="form-row">
       <label>Imię i nazwisko kandydata</label>
       <div style="display:flex;gap:8px">
         <input id="f-kandydat" type="text" placeholder="Jan Bukowiec" value="Jan Bukowiec" style="flex:1">
-        <button type="button" onclick="openScannerQR()" style="padding:0 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--accent);font-size:1.1rem;cursor:pointer;flex-shrink:0" title="Skanuj QR kandydata">⬛</button>
+        <label style="padding:0 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--accent);font-size:1.1rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center" title="Skanuj QR kandydata">
+  ⬛<input type="file" accept="image/*" capture="environment" onchange="scanQRFromImage(this)" style="display:none">
+</label>
       </div>
     </div>
     <div class="form-row">
@@ -418,7 +420,7 @@
     <div class="legal">Rozp. MI z dn. 24.11.2023 r. (Dz.U. poz. 2659) | art. 51 ustawy o kierujących pojazdami<br>Arkusz w postaci elektronicznej — podpis cyfrowy wymagany przed przekazaniem kandydatowi</div>
   </div>
 </div>
- 
+
 <!-- ══════ SCREEN 2: HP ══════ -->
 <!-- ══════ SCREEN HP-INTRO: Wyjaśnienie przed testem HP ══════ -->
 <div class="screen" id="screen-hp-intro">
@@ -427,7 +429,7 @@
     <div class="badge" style="background:var(--warn);color:#000">HP</div>
     <span id="hpi-kandydat-name" style="font-size:.8rem;color:var(--muted);margin-left:8px"></span>
   </div>
- 
+
   <div style="flex:1;display:flex;flex-direction:column;background:#000;position:relative">
     <video id="hpi-video"
       style="width:100%;flex:1;object-fit:contain;display:block"
@@ -439,7 +441,7 @@
       <p style="font-family:var(--mono);font-size:.8rem">Ładowanie wyjaśnienia…</p>
     </div>
   </div>
- 
+
   <div style="background:var(--surface);border-top:1px solid var(--border);padding:16px 18px;display:flex;flex-direction:column;gap:12px">
     <div style="font-size:.85rem;color:var(--text);line-height:1.5">
       <b style="color:var(--warn)">Test Hazard Perception (HP)</b> — obejrzyj krótkie klipy wideo i dotknij ekranu gdy zauważysz zagrożenie na drodze. Wynik jest <b>diagnostyczny</b> i nie wpływa na rezultat egzaminu.
@@ -449,7 +451,7 @@
     </button>
   </div>
 </div>
- 
+
 <div class="screen" id="screen-hp">
   <div class="hdr">
     <div class="hdr-logo">DriveTab</div>
@@ -458,17 +460,17 @@
     <div class="hdr-sub" id="hp-subtitle">Klip 1 z 5</div>
   </div>
   <div class="hp-progress"><div class="hp-progress-bar" id="hp-prog-bar" style="width:20%"></div></div>
- 
+
   <!-- VIDEO AREA — tap to mark hazard -->
   <div class="hp-video-area" id="hp-tap-area" onclick="hpTap(event)">
     <div class="hp-tap-feedback" id="hp-tap-ring"></div>
- 
+
     <!-- Odtwarzacz wideo -->
     <video id="hp-video"
       style="display:none;pointer-events:none"
       playsinline webkit-playsinline preload="auto" x-webkit-airplay="allow">
     </video>
- 
+
     <!-- Placeholder gdy wideo niedostępne -->
     <div class="hp-placeholder" id="hp-placeholder" style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
       <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -478,21 +480,21 @@
       <p id="hp-placeholder-msg">Ładowanie klipu…</p>
       <p style="font-size:.7rem;opacity:.6">Klip: <span id="hp-clip-name">—</span></p>
     </div>
- 
+
     <div class="hp-result-banner" id="hp-result-banner" style="z-index:20">
       <h2 id="hp-result-txt">✓ Zagrożenie zaznaczone</h2>
       <p id="hp-result-sub">w 0.0 s od pojawienia się</p>
     </div>
   </div>
- 
+
   <div class="hp-timer-bar"><div class="hp-timer-fill" id="hp-timer-fill" style="width:100%"></div></div>
- 
+
   <div class="hp-controls">
     <div class="hp-clip-info" id="hp-clip-info">Kliknij START aby odtworzyć klip egzaminacyjny</div>
     <div class="hp-hit-list" id="hp-hit-list"></div>
   </div>
 </div>
- 
+
 <!-- ══════ SCREEN 3: MANEWRY + RUCH ══════ -->
 <div class="screen" id="screen-manewry">
   <div class="hdr">
@@ -501,7 +503,7 @@
     <span id="man-kandydat-name" style="font-size:.8rem;color:var(--muted);margin-left:8px"></span>
     <div class="hdr-sub" id="man-subtitle">Przygotowanie pojazdu</div>
   </div>
- 
+
   <!-- ── PRZYGOTOWANIE POJAZDU ── -->
   <div class="section" id="sec-przygotowanie">
     <div class="section-title">Przygotowanie pojazdu do jazdy</div>
@@ -509,19 +511,19 @@
       <!-- filled by JS -->
     </div>
   </div>
- 
+
   <!-- ── PLAC MANEWROWY ── -->
   <div class="section" id="sec-plac">
     <div class="section-title">Plac manewrowy — zadania</div>
     <div id="plac-tasks"><!-- JS --></div>
   </div>
- 
+
   <!-- ── RUCH DROGOWY ── -->
   <div class="section" id="sec-ruch" style="display:none">
     <div class="section-title">Ruch drogowy — obserwowane błędy</div>
     <div class="err-grid" id="ruch-errs"><!-- JS --></div>
   </div>
- 
+
   <div class="sticky-bar">
     <div style="flex:1">
       <div class="phase-label" id="sticky-phase-lbl">Faza: Plac</div>
@@ -531,14 +533,14 @@
     <button class="btn-primary" id="btn-next-phase" onclick="nextPhase()">Ruch drogowy →</button>
   </div>
 </div>
- 
+
 <!-- ══════ SCREEN 4: WYNIK ══════ -->
 <div class="screen" id="screen-wynik">
   <div class="hdr">
     <div class="hdr-logo">DriveTab</div>
     <div class="badge">WYNIK</div>
   </div>
- 
+
   <div class="wynik-hero">
     <div class="wynik-verdict" id="wy-verdict">POZYTYWNY</div>
     <div class="wynik-sub" id="wy-sub">Egzamin zakończony</div>
@@ -549,14 +551,14 @@
       <div class="meta-box"><div class="meta-val" id="wy-egzaminator">—</div><div class="meta-lbl">Egzaminator</div></div>
     </div>
   </div>
- 
+
   <div class="wynik-errs" id="wynik-errs-list"></div>
- 
+
   <button class="btn-pdf" onclick="generatePDF()">⬇ Generuj arkusz PDF</button>
   <button class="btn-new" onclick="nowyEgzamin()">+ Nowy egzamin</button>
   <div style="height:40px"></div>
 </div>
- 
+
 <script>
 // ═══════════════════════════════════════════════════════════
 //  STATE
@@ -567,9 +569,9 @@ const state = {
   plac: {}, ruch: {},
   verdict: null, stopReason: null
 };
- 
+
 // ─── DANE EGZAMINU ────────────────────────────────────────
- 
+
 const PREP_ITEMS = [
   { id:'olej', label:'Sprawdzenie poziomu oleju' },
   { id:'chlodnica', label:'Płyn chłodniczy' },
@@ -580,7 +582,7 @@ const PREP_ITEMS = [
   { id:'pasy', label:'Pasy bezpieczeństwa' },
   { id:'lusterka', label:'Lusterka / fotel' },
 ];
- 
+
 const PLAC_TASKS = [
   { id:'T1', name:'Przygotowanie do jazdy', abbr:'PRZYGOT.' },
   { id:'T2', name:'Ruszanie z miejsca — wzdłuż', abbr:'RUSZANIE' },
@@ -589,7 +591,7 @@ const PLAC_TASKS = [
   { id:'T5', name:'Ruszanie z miejsca na wzniesieniu', abbr:'WZNIES.' },
   { id:'T6', name:'Zatrzymanie pojazdu we wskazanym miejscu', abbr:'ZATRZYMANIE' },
 ];
- 
+
 const RUCH_ERRORS = [
   { id:'E1',  label:'Włączanie się do ruchu', sub:'' },
   { id:'E2',  label:'Jazda drogami dwukierunkowymi jednojezdniowymi', sub:'' },
@@ -628,7 +630,7 @@ const RUCH_ERRORS = [
   { id:'E33', label:'Zachowanie w odniesieniu do innych uczestników ruchu', sub:'' },
   { id:'E34', label:'Respektowanie zasad techniki kierowania pojazdami', sub:'' },
 ];
- 
+
 // Ścieżka do folderu z klipami — zmień jeśli przeniesiesz folder
 const HP_CLIPS = [
   // Grupa 1-16, 18-47 — może wchodzić do losowania swobodnie
@@ -665,7 +667,7 @@ const HP_CLIPS = [
   { name:'Klip 43',  file:'klip43.mp4',  group:43, winStart:17,    winEnd:21 },
   { name:'Klip 47',  file:'klip47.mp4',  group:47, winStart:14,    winEnd:18 },
 ];
- 
+
 // Oblicz punkty za trafienie w oknie czasowym (obsługuje 2 okna)
 // 1. sekunda okna = 5 pkt, 2. = 4 pkt ... 5+ = 1 pkt, poza oknem = 0
 function calcHpScore(t, winStart, winEnd, winStart2, winEnd2) {
@@ -678,7 +680,7 @@ function calcHpScore(t, winStart, winEnd, winStart2, winEnd2) {
   const s2 = (winStart2 !== undefined) ? scoreWindow(t, winStart2, winEnd2) : 0;
   return Math.max(s1, s2);
 }
- 
+
 // ═══════════════════════════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════════════════════════
@@ -691,13 +693,13 @@ function showScreen(id){
   el.classList.add('active');
   el.scrollTop = 0;
 }
- 
+
 function toast(msg, dur=2200){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), dur);
 }
- 
+
 function todayISO(){
   const d = new Date();
   const dd = String(d.getDate()).padStart(2,'0');
@@ -708,7 +710,7 @@ function todayISO(){
 function nowHM(){
   const d=new Date(); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
 }
- 
+
 // ═══════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════
@@ -718,13 +720,13 @@ function initDateTime(){
   document.getElementById('f-godzina').value = nowHM();
 }
 // initDateTime wywołana na końcu skryptu
- 
+
 // Detekcja urządzenia
 const isIPad = /iPad/.test(navigator.userAgent) ||
   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isIPhone = /iPhone/.test(navigator.userAgent);
 const isTablet = isIPad || (window.screen.width >= 768 && 'ontouchstart' in window);
- 
+
 // Dostosuj układ do urządzenia
 if (isTablet) {
   // iPad / tablet — większy font, dwukolumnowy plac i ruch
@@ -734,11 +736,11 @@ if (isTablet) {
   document.documentElement.style.setProperty('--row-cols', '1');
   document.body.classList.add('is-phone');
 }
- 
+
 // Pokaż info o urządzeniu w stopce formularza
 const deviceLabel = isIPad ? 'iPad' : isIPhone ? 'iPhone' : isTablet ? 'Tablet' : 'Telefon';
 console.log('DriveTab: wykryto urządzenie —', deviceLabel, window.screen.width + 'x' + window.screen.height);
- 
+
 // Auto-format daty DD.MM.YYYY podczas pisania
 document.getElementById('f-data').addEventListener('input', function(){
   let v = this.value.replace(/\D/g,'');
@@ -746,19 +748,19 @@ document.getElementById('f-data').addEventListener('input', function(){
   if(v.length>5) v = v.slice(0,5)+'.'+v.slice(5,9);
   this.value = v;
 });
- 
+
 // Auto-format godziny GG:MM podczas pisania
 document.getElementById('f-godzina').addEventListener('input', function(){
   let v = this.value.replace(/\D/g,'');
   if(v.length>2) v = v.slice(0,2)+':'+v.slice(2,4);
   this.value = v;
 });
- 
+
 function startEgzamin(){
   const k = document.getElementById('f-kandydat').value.trim();
   const pkk = document.getElementById('f-pkk').value.trim();
   if(!k){ toast('Wpisz imię i nazwisko kandydata'); return; }
- 
+
   state.meta = {
     kandydat: k,
     pkk: pkk || '—',
@@ -770,14 +772,14 @@ function startEgzamin(){
     pojazd: document.getElementById('f-pojazd').value.trim() || '—',
     tsStart: Date.now(),
   };
- 
+
   // reset state
   state.hp = { clips: drawHPClips(), current:0, done:false };
   state.plac = {}; state.ruch = {}; state.verdict = null; state.stopReason = null;
   PREP_ITEMS.forEach(p=>{ state.plac['prep_'+p.id] = {count:0, done:false}; });
   PLAC_TASKS.forEach(t=>{ state.plac[t.id] = {count:0, done:false}; });
   RUCH_ERRORS.forEach(e=>{ state.ruch[e.id] = {count:0, done:false}; });
- 
+
   const faza = document.getElementById('f-faza').value;
   if(faza === 'hp'){
     initHP(); // initHP sam wywołuje showScreen('hp-intro') lub showScreen('hp')
@@ -785,24 +787,24 @@ function startEgzamin(){
     initManewry(); showScreen('manewry');
   }
 }
- 
+
 // ═══════════════════════════════════════════════════════════
 //  PHASE: HP
 // ═══════════════════════════════════════════════════════════
 let hpTimer = null, hpSeconds = 0, hpMaxSec = 0, hpClipActive = false;
- 
+
 function drawHPClips() {
   // Losuj 5 klipów z 30 — zasada: max 1 klip z grupy 17
   const pool = [...HP_CLIPS];
   const selected = [];
   let group17used = false;
- 
+
   // Przetasuj
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
- 
+
   for (const clip of pool) {
     if (selected.length >= 5) break;
     if (clip.group === 17) {
@@ -811,7 +813,7 @@ function drawHPClips() {
     }
     selected.push({...clip, hits: [], done: false});
   }
- 
+
   // Jeśli nie wylosowano 5 (np. za mało klipów spoza gr.17), uzupełnij
   if (selected.length < 5) {
     for (const clip of pool) {
@@ -821,10 +823,10 @@ function drawHPClips() {
       }
     }
   }
- 
+
   return selected;
 }
- 
+
 function initHP(){
   document.getElementById('hp-kandydat-name').textContent = state.meta.kandydat;
   document.getElementById('hpi-kandydat-name').textContent = state.meta.kandydat;
@@ -837,38 +839,38 @@ function initHP(){
   vid.onerror   = () => { ph.querySelector('p').textContent = 'Brak pliku wyjasnienie.mp4'; };
   vid.load();
 }
- 
- 
+
+
 function hpiStart(){
   const vid = document.getElementById('hpi-video');
   vid.pause(); vid.src = '';
   showScreen('hp');
   loadHPClip(0);
 }
- 
+
 function loadHPClip(idx){
   const clip = state.hp.clips[idx];
   state.hp.current = idx;
- 
+
   document.getElementById('hp-subtitle').textContent = `Klip ${idx+1} z ${state.hp.clips.length}`;
   document.getElementById('hp-prog-bar').style.width = ((idx+1)/state.hp.clips.length*100)+'%';
   document.getElementById('hp-clip-name').textContent = clip.name;
   document.getElementById('hp-hit-list').innerHTML = '';
   document.getElementById('hp-result-banner').style.display = 'none';
   document.getElementById('hp-timer-fill').style.width = '100%';
- 
+
   clearInterval(hpTimer);
   hpClipActive = false;
   hpSeconds = 0;
- 
+
   const video = document.getElementById('hp-video');
   const placeholder = document.getElementById('hp-placeholder');
   const msg = document.getElementById('hp-placeholder-msg');
- 
+
   msg.textContent = 'Ładowanie klipu…';
   placeholder.style.display = 'flex';
   video.style.display = 'none';
- 
+
   video.src = './' + clip.file;
   video.load();
   video.onloadstart = () => {
@@ -894,12 +896,12 @@ function loadHPClip(idx){
       hpTimer = setInterval(() => hpTickTimer(video), 100);
     }
   }, 4000);
- 
+
   document.getElementById('hp-clip-info').textContent = `⏳ Ładowanie: ${clip.name}`;
   console.log('HP video src:', video.src);
   console.log('HP video readyState:', video.readyState);
   console.log('HP video networkState:', video.networkState);
- 
+
   video.onloadeddata = () => {
     placeholder.style.display = 'none';
     video.style.display = 'block';
@@ -933,14 +935,14 @@ function loadHPClip(idx){
       hpTimer = setInterval(() => hpTickTimer(video), 100);
     }
   };
- 
+
   video.onended = () => {
     clearInterval(hpTimer);
     hpClipActive = false;
     document.getElementById('hp-timer-fill').style.width = '0%';
     setTimeout(() => hpNextClip(), 800);
   };
- 
+
   video.onerror = () => {
     video.style.display = 'none';
     placeholder.style.display = 'flex';
@@ -951,13 +953,13 @@ function loadHPClip(idx){
     hpMaxSec = clip.winEnd + 10;
   };
 }
- 
+
 function hpTickTimer(video){
   hpSeconds = video.currentTime || hpSeconds + 0.1;
   const pct = Math.max(0, 100 - (hpSeconds / hpMaxSec * 100));
   document.getElementById('hp-timer-fill').style.width = pct + '%';
 }
- 
+
 function hpTap(event){
   if(!hpClipActive) return;
   const ring = document.getElementById('hp-tap-ring');
@@ -967,14 +969,14 @@ function hpTap(event){
   ring.style.display = 'block';
   ring.style.animation = 'none'; ring.offsetHeight;
   ring.style.animation = 'tapRing .5s ease-out forwards';
- 
+
   const video = document.getElementById('hp-video');
   const tRaw = video.currentTime || hpSeconds;
   const t = tRaw.toFixed(1);
   const c = state.hp.clips[state.hp.current];
   const pts = calcHpScore(tRaw, c.winStart, c.winEnd, c.winStart2, c.winEnd2);
   c.hits.push({ t: parseFloat(t), pts });
- 
+
   // Wizualna informacja o trafieniu
   const li = document.createElement('div');
   li.className = 'hp-hit';
@@ -986,7 +988,7 @@ function hpTap(event){
     li.style.color = 'var(--danger)';
   }
   document.getElementById('hp-hit-list').appendChild(li);
- 
+
   const banner = document.getElementById('hp-result-banner');
   if (pts > 0) {
     const inWindow = `${(tRaw - c.winStart).toFixed(1)}s od początku okna`;
@@ -1002,7 +1004,7 @@ function hpTap(event){
   banner.style.display = 'block';
   setTimeout(()=>{ banner.style.display = 'none'; }, 2000);
 }
- 
+
 function hpNextClip(){
   clearInterval(hpTimer);
   hpClipActive = false;
@@ -1018,12 +1020,12 @@ function hpNextClip(){
     toast('✓ Test HP zakończony — przejście do placu manewrowego');
   }
 }
- 
+
 // ═══════════════════════════════════════════════════════════
 //  PHASE: MANEWRY + RUCH
 // ═══════════════════════════════════════════════════════════
 let currentPhase = 'plac';
- 
+
 function initManewry(){
   document.getElementById('man-kandydat-name').textContent = state.meta.kandydat;
   currentPhase = 'plac';
@@ -1036,7 +1038,7 @@ function initManewry(){
   document.getElementById('btn-next-phase').textContent = 'Ruch drogowy →';
   updateStickyBar();
 }
- 
+
 function renderPrepGrid(){
   const g = document.getElementById('prep-grid');
   g.innerHTML = '';
@@ -1055,7 +1057,7 @@ function renderPrepGrid(){
     g.appendChild(div);
   });
 }
- 
+
 function tapPrep(id){
   const s = state.plac['prep_'+id];
   if(s.count > 0) return;
@@ -1063,7 +1065,7 @@ function tapPrep(id){
   refreshPrepItem(id);
   updateStickyBar();
 }
- 
+
 function incPrep(id, delta){
   const s = state.plac['prep_'+id];
   s.count = Math.max(0, s.count + delta);
@@ -1071,7 +1073,7 @@ function incPrep(id, delta){
   refreshPrepItem(id);
   updateStickyBar();
 }
- 
+
 function refreshPrepItem(id){
   const s = state.plac['prep_'+id];
   const n = s.count;
@@ -1083,8 +1085,8 @@ function refreshPrepItem(id){
   else if(s.done)   item.className = 'err-item err-ok';
   else              item.className = 'err-item';
 }
- 
- 
+
+
 function renderPlacTasks(){
   const container = document.getElementById('plac-tasks');
   container.innerHTML = '';
@@ -1103,7 +1105,7 @@ function renderPlacTasks(){
     container.appendChild(div);
   });
 }
- 
+
 function tapPlac(id){
   const s = state.plac[id];
   if(s.count > 0) return; // ignoruj tap gdy są błędy
@@ -1111,7 +1113,7 @@ function tapPlac(id){
   refreshPlacItem(id);
   updateStickyBar();
 }
- 
+
 function incPlac(id, delta){
   const s = state.plac[id];
   s.count = Math.max(0, s.count + delta);
@@ -1122,7 +1124,7 @@ function incPlac(id, delta){
   if(state.plac[id].count>=2) toast('⚠ '+PLAC_TASKS.find(t=>t.id===id).name+' — 2× błąd');
   if(fails>=2) toast('⚠ 2 zadania z dwukrotnym błędem — podstawa do negatywnego wyniku');
 }
- 
+
 function refreshPlacItem(id){
   const s = state.plac[id];
   const n = s.count;
@@ -1134,7 +1136,7 @@ function refreshPlacItem(id){
   else if(s.done)  item.className = 'err-item err-ok';
   else             item.className = 'err-item';
 }
- 
+
 function renderRuchErrors(){
   const c = document.getElementById('ruch-errs');
   c.innerHTML = '';
@@ -1154,7 +1156,7 @@ function renderRuchErrors(){
     c.appendChild(div);
   });
 }
- 
+
 function incErr(id, delta){
   const s = state.ruch[id];
   s.count = Math.max(0, s.count + delta);
@@ -1163,7 +1165,7 @@ function incErr(id, delta){
   updateStickyBar();
   if(s.count >= 2) toast(`⚠ ${RUCH_ERRORS.find(e=>e.id===id).label} — błąd dwukrotny`);
 }
- 
+
 function toggleDone(id){
   const s = state.ruch[id];
   if(s.count > 0) return; // klik na wiersz ignorowany gdy są błędy
@@ -1171,7 +1173,7 @@ function toggleDone(id){
   refreshErrItem(id);
   updateStickyBar();
 }
- 
+
 function refreshErrItem(id){
   const s = state.ruch[id];
   const n = s.count;
@@ -1188,7 +1190,7 @@ function refreshErrItem(id){
     item.className = 'err-item';
   }
 }
- 
+
 function updateStickyBar(){
   if(currentPhase==='plac'){
     const donePlac = PLAC_TASKS.filter(t=>state.plac[t.id].done||state.plac[t.id].count>0).length;
@@ -1206,7 +1208,7 @@ function updateStickyBar(){
       `oceniono ${assessed}/${RUCH_ERRORS.length} | ${total} błędów | ${dbl} dwukrotnych`;
   }
 }
- 
+
 function nextPhase(){
   if(currentPhase==='plac'){
     // check plac result
@@ -1225,13 +1227,13 @@ function nextPhase(){
     zakończEgzamin('normalny');
   }
 }
- 
+
 function stopEgzamin(){
   if(confirm('Przerwać egzamin? Wynik będzie NEGATYWNY.')){
     zakończEgzamin('przerwany');
   }
 }
- 
+
 // ═══════════════════════════════════════════════════════════
 //  WYNIK
 // ═══════════════════════════════════════════════════════════
@@ -1239,25 +1241,25 @@ function zakończEgzamin(reason){
   state.stopReason = reason;
   state.meta.tsEnd = Date.now();
   const dur = Math.round((state.meta.tsEnd - state.meta.tsStart)/60000);
- 
+
   // ─ Oblicz wynik ─
   const placFails2 = PLAC_TASKS.filter(t=>state.plac[t.id].count>=2).length;
   const ruchDoubles = RUCH_ERRORS.filter(e=>state.ruch[e.id].count>=2).length;
   const directDanger = false; // przerwanie przez egzaminatora obsługiwane przez btn PRZERWIJ
   const interrupted = reason==='przerwany';
   const positive = !interrupted && placFails2 < 2 && ruchDoubles === 0 && !directDanger;
- 
+
   state.verdict = positive ? 'POZYTYWNY' : 'NEGATYWNY';
- 
+
   // ─ Render wynik ─
   const vEl = document.getElementById('wy-verdict');
   vEl.textContent = state.verdict;
   vEl.className = 'wynik-verdict ' + (positive?'pozytywny':'negatywny');
- 
+
   let sub = positive ? 'Kandydat zdał egzamin praktyczny' : 'Kandydat nie zdał egzaminu praktycznego';
   if(interrupted) sub += ' — egzamin przerwany';
   document.getElementById('wy-sub').textContent = sub;
- 
+
   // HP summary
   const hpHits = state.hp.clips ? state.hp.clips.reduce((a,c)=>a+(c.hits.length>0?1:0),0) : 0;
   const hpTotal = state.hp.clips ? state.hp.clips.length : 0;
@@ -1271,11 +1273,11 @@ function zakończEgzamin(reason){
   hpEl.textContent = state.hp.done
     ? `HP: ${hpPts}/25 pkt — ${hpHits}/${hpTotal} klipów`
     : 'HP: nie przeprowadzono';
- 
+
   document.getElementById('wy-kandydat').textContent = state.meta.kandydat;
   document.getElementById('wy-data').textContent = `${state.meta.data} ${state.meta.godzina}`;
   document.getElementById('wy-egzaminator').textContent = state.meta.egzaminator;
- 
+
   // błędy lista
   const errList = document.getElementById('wynik-errs-list');
   errList.innerHTML = '<div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;font-weight:600">Odnotowane błędy</div>';
@@ -1301,10 +1303,10 @@ function zakończEgzamin(reason){
     }
   });
   if(!hasErr) errList.innerHTML += '<div style="color:var(--ok);font-size:.85rem">Brak odnotowanych błędów</div>';
- 
+
   showScreen('wynik');
 }
- 
+
 // ═══════════════════════════════════════════════════════════
 //  PDF GENERATOR — układ zgodny z Rozp. MI 2023 poz. 2659
 // ═══════════════════════════════════════════════════════════
@@ -1312,7 +1314,7 @@ function generatePDF(){
   const m = state.meta;
   const positive = state.verdict==='POZYTYWNY';
   const dur = Math.round(((m.tsEnd||Date.now()) - m.tsStart)/60000);
- 
+
   // Generuj QR przez URL API (api.qrserver.com) — niezawodne, skanowalne
   const qrContent = encodeURIComponent(
     'DRIVETAB EGZAMIN' +
@@ -1327,7 +1329,7 @@ function generatePDF(){
     '\nHP: ' + (state.hp.done ? state.hp.clips.reduce((s,cl)=>s+cl.hits.reduce((mx,h)=>h.pts>mx?h.pts:mx,0),0)+'/25' : 'brak')
   );
   const qrDataUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=' + qrContent;
- 
+
   // Helper: ocena zadania → symbole 1□ 2□ □
   function ocena(id){
     const s = state.plac[id] || {count:0,done:false};
@@ -1337,7 +1339,7 @@ function generatePDF(){
     const poz = (n===0 && s.done) ? '&#x2611;' : '&#x25A1;';
     return `<span class="sym">${n1}</span><span class="sym">${n2}</span><span class="sym poz">${poz}</span>`;
   }
- 
+
   // Pełna lista zadań placu (wg arkusza — kat. B)
   const PLAC_PDF = [
     {nr:'1',  name:'Przygotowanie do jazdy', id:'T1'},
@@ -1347,7 +1349,7 @@ function generatePDF(){
     {nr:'4.2',name:'Parkowanie prostopadłe (wjazd tyłem – wyjazd przodem)', id:'T5'},
     {nr:'6',  name:'Ruszanie z miejsca do przodu na wzniesieniu', id:'T6'},
   ];
- 
+
   // Pełna lista zadań ruch drogowy (wg arkusza)
   const RUCH_PDF = [
     {nr:'1',  name:'Włączanie się do ruchu', id:'E1'},
@@ -1387,7 +1389,7 @@ function generatePDF(){
     {nr:'33', name:'Zachowanie w odniesieniu do innych uczestników ruchu', id:'E33'},
     {nr:'34', name:'Respektowanie zasad techniki kierowania pojazdami', id:'E34'},
   ];
- 
+
   function ruchOcena(pdfId){
     const s = state.ruch[pdfId] || {count:0, done:false};
     const n = s.count;
@@ -1396,28 +1398,28 @@ function generatePDF(){
     const poz = (n===0 && s.done) ? '&#x2611;' : (n===0 && !s.done) ? '&#x25A1;' : '&#x25A1;';
     return `<span class="sym">${n1}</span><span class="sym">${n2}</span><span class="sym poz">${poz}</span>`;
   }
- 
+
   // HP score
   const hpPts = state.hp.done
     ? state.hp.clips.reduce((s,cl)=>s+cl.hits.reduce((mx,h)=>h.pts>mx?h.pts:mx,0),0)
     : null;
- 
+
   // Generuj wiersze lewej kolumny (plac + pierwsze 14 ruch)
   const placRowsHtml = PLAC_PDF.map(t=>{
     const v = state.plac[t.id]||null;
     return `<tr><td class="nr">${t.nr}</td><td class="name">${t.name}</td><td class="oc">${ocena(t.id)}</td></tr>`;
   }).join('');
- 
+
   // separator między placem a ruchem w lewej kolumnie
   const ruchLeft = RUCH_PDF.slice(0,14).map(t=>`<tr><td class="nr">${t.nr}</td><td class="name">${t.name}</td><td class="oc">${ruchOcena(t.id)}</td></tr>`).join('');
   const ruchRight = RUCH_PDF.slice(14).map(t=>`<tr><td class="nr">${t.nr}</td><td class="name">${t.name}</td><td class="oc">${ruchOcena(t.id)}</td></tr>`).join('');
- 
+
   const hpSection = state.hp.done ? (
     '<tr style="background:#eef7ee"><td colspan="3" style="padding:3px 4px;font-size:7pt;color:#1a6b3a">' +
     '<b>TEST HP (diagnostyczny):</b> ' + hpPts + '/25 pkt \u2014 nie wp\u0142ywa na wynik egzaminu' +
     '</td></tr>'
   ) : '';
- 
+
   // CSS dla PDF — w backtick template, bezpieczne bo nie zawiera tagów HTML
   const pdfCSS = `
   @page { size: A4 portrait; margin: 8mm 6mm; }
@@ -1460,7 +1462,7 @@ function generatePDF(){
   .footer { font-size: 5.5pt; color: #888; border-top: 1px solid #ddd;
     padding-top: 3px; margin-top: 6px; }
   `;
- 
+
   // Buduj HTML przez string concatenation — bez żadnych strukturalnych tagów w template literal
   const T = (t) => '<' + t;   // otwórz tag
   const html = [
@@ -1472,7 +1474,7 @@ function generatePDF(){
     T('style>') + pdfCSS + '</style>',
     '</head>',
     T('body>'),
- 
+
     T('div class="top-meta">'),
       T('div style="flex:2">') + T('span class="lbl">') + 'Nazwisko i imi\u0119 osoby egzaminowanej' + '</span>' + T('span class="val">') + m.kandydat + '</span></div>',
       T('div style="flex:2">') + T('span class="lbl">') + 'Data i godzina cz\u0119\u015Bci praktycznej egzaminu pa\u0144stwowego' + '</span>' + T('span class="val">') + m.data + ' / ' + m.godzina + '</span></div>',
@@ -1483,9 +1485,9 @@ function generatePDF(){
       T('div style="flex:2">') + T('span class="lbl">') + 'Nr zestawu (nie dotyczy kat. AM, A1, A2, A, B, B1)' + '</span>' + T('span class="val">') + '\u2014' + '</span></div>',
       T('div>') + T('span class="lbl">') + 'WORD' + '</span>' + T('span class="val" style="font-size:7pt">') + m.word + '</span></div>',
     '</div>',
- 
+
     T('div class="title-row">') + 'ARKUSZ PRZEBIEGU CZ\u0118\u015ACI PRAKTYCZNEJ EGZAMINU PA\u0143STWOWEGO NA PRAWO JAZDY' + '</div>',
- 
+
     T('div class="two-col">'),
       T('div class="col-left">'),
         T('table>'),
@@ -1518,16 +1520,16 @@ function generatePDF(){
         '</div>',
       '</div>',
     '</div>',
- 
+
     T('div class="footer">'),
       'Nr PKK: ' + m.pkk + ' &nbsp;|&nbsp; Arkusz elektroniczny \u2014 Rozp. MI z dn. 24.11.2023 r. (Dz.U. poz. 2659) \u00A7 28 ust. 1 pkt 7 &nbsp;|&nbsp; Wynik potwierdzony: kwalifikowanym podpisem elektronicznym / podpisem osobistym / podpisem zaufanym &nbsp;|&nbsp; DriveTab v1.0 &nbsp;|&nbsp; ' + new Date().toLocaleString('pl-PL'),
     '</div>',
- 
+
     '</body>',
     '</html>'
   ].join('');
- 
- 
+
+
   // Użyj Blob URL zamiast document.write — bezpieczne dla iOS Safari
   const blob = new Blob([html], {type: 'text/html'});
   const blobUrl = URL.createObjectURL(blob);
@@ -1545,18 +1547,51 @@ function nowyEgzamin(){
   showScreen('intro');
   initDateTime();
 }
- 
+
 // ══ SKANER QR KANDYDATA ══════════════════════════════════
 let qrScanInterval = null;
 let qrStream = null;
- 
+
+function scanQRFromImage(input){
+  if(!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width; canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    if(typeof jsQR === 'undefined'){
+      // jsQR nie załadowane — spróbuj załadować dynamicznie
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+      s.onload = () => {
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        if(code) parseQRData(code.data);
+        else toast('Nie znaleziono kodu QR na zdjęciu');
+      };
+      s.onerror = () => toast('⚠ Brak internetu — nie można załadować skanera');
+      document.head.appendChild(s);
+      return;
+    }
+    const code = jsQR(imageData.data, imageData.width, imageData.height, {inversionAttempts:'attemptBoth'});
+    if(code) parseQRData(code.data);
+    else toast('Nie znaleziono kodu QR — spróbuj ponownie');
+    input.value = '';
+  };
+  img.src = url;
+}
+
 function openScannerQR(){
   const modal = document.getElementById('qr-scanner-modal');
   modal.style.display = 'flex';
   const video = document.getElementById('qr-cam');
   const statusEl = document.getElementById('qr-scan-status');
   statusEl.textContent = 'Uruchamianie kamery…';
- 
+
   // Załaduj jsQR dynamicznie jeśli nie jest dostępne
   if(typeof jsQR === 'undefined'){
     statusEl.textContent = 'Ładowanie biblioteki QR…';
@@ -1569,7 +1604,7 @@ function openScannerQR(){
   }
   startCamera();
 }
- 
+
 function startCamera(){
   const video = document.getElementById('qr-cam');
   const statusEl = document.getElementById('qr-scan-status');
@@ -1585,7 +1620,7 @@ function startCamera(){
     statusEl.textContent = '⚠ Brak dostępu do kamery: ' + err.message;
   });
 }
- 
+
 function scanFrameQR(){
   const video = document.getElementById('qr-cam');
   if(video.readyState !== video.HAVE_ENOUGH_DATA) return;
@@ -1608,18 +1643,18 @@ function scanFrameQR(){
     setTimeout(() => parseQRData(scannedData), 300);
   }
 }
- 
+
 function parseQRData(text){
   let kandydat = '', pkk = '', pesel = '';
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
- 
+
   // Format 1: etykiety
   for(const l of lines){
     if(l.startsWith('Kandydat:'))  kandydat = l.slice(9).trim();
     else if(l.startsWith('PKK:'))  pkk      = l.slice(4).trim();
     else if(l.startsWith('PESEL:'))pesel    = l.slice(6).trim();
   }
- 
+
   // Format 2: pipe
   if(!kandydat && text.includes('|')){
     const parts = text.split('|').map(p => p.trim());
@@ -1629,7 +1664,7 @@ function parseQRData(text){
       else if(/^\d{11}$/.test(parts[i]))    pesel = parts[i];
     }
   }
- 
+
   // Format 3: linie bez etykiet
   if(!kandydat && lines.length >= 2){
     kandydat = lines[0];
@@ -1638,9 +1673,9 @@ function parseQRData(text){
       else if(/^\d{11}$/.test(lines[i]))    pesel = lines[i];
     }
   }
- 
+
   if(!kandydat) kandydat = text.trim().slice(0, 60);
- 
+
   // Wpisz do formularza - użyj setAttribute dla pewności na iOS
   const fk = document.getElementById('f-kandydat');
   const fp = document.getElementById('f-pkk');
@@ -1657,7 +1692,7 @@ function closeScannerQR(){
   video.srcObject = null;
   document.getElementById('qr-scanner-modal').style.display = 'none';
 }
- 
+
 // Inicjalizuj datę po załadowaniu wszystkiego
 window.addEventListener("load", initDateTime);
 initDateTime();
