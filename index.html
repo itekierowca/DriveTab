@@ -79,7 +79,7 @@
   .legal { font-size: .68rem; color: var(--muted); margin-top: 14px; text-align: center; line-height: 1.5; }
  
   /* ── HP PHASE ── */
-  #screen-hp { background: #000; height: 100vh; }
+  #screen-hp { background: #000; height: 100vh; display: flex; flex-direction: column; }
   .hp-header {
     background: rgba(0,0,0,.8); border-bottom: 1px solid #1a1a1a;
     padding: 12px 20px; display: flex; align-items: center; gap: 14px;
@@ -87,17 +87,18 @@
   .hp-counter { font-family: var(--mono); font-size: .85rem; color: var(--muted); margin-left: auto; }
   .hp-progress { height: 3px; background: #1a1a1a; position: relative; }
   .hp-progress-bar { height: 100%; background: var(--accent); transition: width .3s; }
-  #hp-video { width:100%; height:100%; object-fit:contain; background:#000; display:block; }
+  #hp-video {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: contain; background: #000;
+  }
   .hp-video-area {
-    flex: 1; display: flex; align-items: center; justify-content: center;
+    flex: 1;
     position: relative; background: #000; cursor: pointer;
     user-select: none; overflow: hidden;
-    min-height: 200px;
+    min-height: 0; /* pozwól flex:1 skurczyć się */
   }
-  .hp-placeholder {
-    display: flex; flex-direction: column; align-items: center; gap: 16px;
-    color: #333; pointer-events: none;
-  }
+  .hp-placeholder { color: #555; pointer-events: none; }
   .hp-placeholder svg { width: 80px; height: 80px; opacity: .4; }
   .hp-placeholder p { font-size: .85rem; font-family: var(--mono); }
   .hp-tap-feedback {
@@ -443,12 +444,12 @@
  
     <!-- Odtwarzacz wideo -->
     <video id="hp-video"
-      style="width:100%;height:100%;object-fit:contain;display:none;pointer-events:none;background:#000"
+      style="display:none;pointer-events:none"
       playsinline webkit-playsinline preload="auto" x-webkit-airplay="allow">
     </video>
  
     <!-- Placeholder gdy wideo niedostępne -->
-    <div class="hp-placeholder" id="hp-placeholder">
+    <div class="hp-placeholder" id="hp-placeholder" style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
       <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="8" y="18" width="64" height="44" rx="4" stroke="currentColor" stroke-width="3"/>
         <polygon points="30,30 30,50 54,40" fill="currentColor"/>
@@ -457,7 +458,7 @@
       <p style="font-size:.7rem;opacity:.6">Klip: <span id="hp-clip-name">—</span></p>
     </div>
  
-    <div class="hp-result-banner" id="hp-result-banner">
+    <div class="hp-result-banner" id="hp-result-banner" style="z-index:20">
       <h2 id="hp-result-txt">✓ Zagrożenie zaznaczone</h2>
       <p id="hp-result-sub">w 0.0 s od pojawienia się</p>
     </div>
@@ -789,13 +790,28 @@ function loadHPClip(idx){
     console.warn('HP video stalled');
     document.getElementById('hp-clip-info').textContent = '⚠ Wideo zatrzymane — sprawdź połączenie';
   };
+  // Fallback: jeśli po 4s placeholder nadal widoczny — wymuś display wideo
+  setTimeout(() => {
+    const ph = document.getElementById('hp-placeholder');
+    if(ph && ph.style.display !== 'none' && video.readyState >= 1) {
+      console.log('Forcing video display, readyState:', video.readyState);
+      ph.style.display = 'none';
+      video.style.display = 'block';
+      hpMaxSec = video.duration || clip.winEnd + 10;
+      document.getElementById('hp-clip-info').textContent =
+        `▶ ${clip.name} — DOTKNIJ gdy widzisz zagrożenie`;
+      hpClipActive = true;
+      video.play().catch(()=>{});
+      hpTimer = setInterval(() => hpTickTimer(video), 100);
+    }
+  }, 4000);
  
   document.getElementById('hp-clip-info').textContent = `⏳ Ładowanie: ${clip.name}`;
   console.log('HP video src:', video.src);
   console.log('HP video readyState:', video.readyState);
   console.log('HP video networkState:', video.networkState);
  
-  video.oncanplay = () => {
+  video.onloadeddata = () => {
     placeholder.style.display = 'none';
     video.style.display = 'block';
     hpMaxSec = video.duration || clip.winEnd + 10;
