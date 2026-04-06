@@ -607,20 +607,52 @@ const RUCH_ERRORS = [
 
 // Ścieżka do folderu z klipami — zmień jeśli przeniesiesz folder
 const HP_CLIPS = [
-  { name:'Klip 1', file:'klip01.mp4', winStart:20, winEnd:25 },
-  { name:'Klip 2', file:'klip02.mp4', winStart:18, winEnd:24 },
-  { name:'Klip 3', file:'klip03.mp4', winStart:18, winEnd:23 },
-  { name:'Klip 4', file:'klip04.mp4', winStart:14, winEnd:18 },
-  { name:'Klip 5', file:'klip05.mp4', winStart:19, winEnd:23 },
+  // Grupa 1-16, 18-47 — może wchodzić do losowania swobodnie
+  { name:'Klip 02',  file:'klip02.mp4',  group:2,  winStart:19.33, winEnd:25 },
+  { name:'Klip 02b', file:'klip02.mp4',  group:2,  winStart:17.67, winEnd:24.33 },
+  { name:'Klip 03',  file:'klp03.mp4',   group:3,  winStart:16.33, winEnd:19.67 },
+  { name:'Klip 04',  file:'klip04.mp4',  group:4,  winStart:14.33, winEnd:17.67 },
+  { name:'Klip 05',  file:'klip05.mp4',  group:5,  winStart:18.33, winEnd:23.33 },
+  { name:'Klip 06',  file:'klip06.mp4',  group:6,  winStart:18.33, winEnd:23.33 },
+  { name:'Klip 07',  file:'klip07.mp4',  group:7,  winStart:15.33, winEnd:20 },
+  { name:'Klip 08',  file:'klip08.mp4',  group:8,  winStart:15.67, winEnd:22.33 },
+  { name:'Klip 10',  file:'klip10.mp4',  group:10, winStart:15.67, winEnd:20 },
+  { name:'Klip 14',  file:'klip14.mp4',  group:14, winStart:15.67, winEnd:18.67 },
+  { name:'Klip 15',  file:'klip15.mp4',  group:15, winStart:16,    winEnd:19.67 },
+  // Grupa 17 — max 1 z poniższych w zestawie
+  { name:'Klip 17',  file:'klip17.mp4',  group:17, winStart:23.33, winEnd:28 },
+  { name:'Klip 17A', file:'klip17A.mp4', group:17, winStart:23.33, winEnd:28 },
+  { name:'Klip 17B', file:'klip17B.mp4', group:17, winStart:23.33, winEnd:28 },
+  { name:'Klip 17C', file:'klip17C.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
+  { name:'Klip 17D', file:'klip17D.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
+  { name:'Klip 17E', file:'klip17E.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
+  // Pozostałe grupy
+  { name:'Klip 18',  file:'klip18.mp4',  group:18, winStart:18.33, winEnd:22.33 },
+  { name:'Klip 19',  file:'klip19.mp4',  group:19, winStart:12.67, winEnd:18 },
+  { name:'Klip 20',  file:'klip20.mp4',  group:20, winStart:18,    winEnd:21.67 },
+  { name:'Klip 21',  file:'klip21.mp4',  group:21, winStart:18.67, winEnd:23.33 },
+  { name:'Klip 22',  file:'klip22.mp4',  group:22, winStart:18,    winEnd:23.33 },
+  { name:'Klip 26',  file:'klip26.mp4',  group:26, winStart:15,    winEnd:20 },
+  { name:'Klip 29',  file:'klip29.mp4',  group:29, winStart:15,    winEnd:20 },
+  { name:'Klip 31',  file:'klip31.mp4',  group:31, winStart:17.67, winEnd:21 },
+  { name:'Klip 32',  file:'klip32.mp4',  group:32, winStart:20.07, winEnd:25.33 },
+  { name:'Klip 35',  file:'klip35.mp4',  group:35, winStart:27,    winEnd:30.33 },
+  { name:'Klip 36',  file:'klip36.mp4',  group:36, winStart:17.67, winEnd:22.67 },
+  { name:'Klip 43',  file:'klip43.mp4',  group:43, winStart:17,    winEnd:21 },
+  { name:'Klip 47',  file:'klip47.mp4',  group:47, winStart:14,    winEnd:18 },
 ];
 
-// Oblicz punkty za trafienie w oknie czasowym
-// 1. sekunda okna = 5 pkt, 2. = 4 pkt ... 5. = 1 pkt, poza oknem = 0
-function calcHpScore(t, winStart, winEnd) {
-  if (t < winStart || t > winEnd) return 0;
-  const delta = t - winStart;          // 0..5
-  const pts = 5 - Math.floor(delta);   // 5,4,3,2,1
-  return Math.max(1, pts);
+// Oblicz punkty za trafienie w oknie czasowym (obsługuje 2 okna)
+// 1. sekunda okna = 5 pkt, 2. = 4 pkt ... 5+ = 1 pkt, poza oknem = 0
+function calcHpScore(t, winStart, winEnd, winStart2, winEnd2) {
+  function scoreWindow(t, ws, we) {
+    if (t < ws || t > we) return 0;
+    const delta = t - ws;
+    return Math.max(1, 5 - Math.floor(delta));
+  }
+  const s1 = scoreWindow(t, winStart, winEnd);
+  const s2 = (winStart2 !== undefined) ? scoreWindow(t, winStart2, winEnd2) : 0;
+  return Math.max(s1, s2);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -712,7 +744,7 @@ function startEgzamin(){
   };
 
   // reset state
-  state.hp = { clips: HP_CLIPS.map(c=>({...c, hits:[], done:false})), current:0, done:false };
+  state.hp = { clips: drawHPClips(), current:0, done:false };
   state.plac = {}; state.ruch = {}; state.verdict = null; state.stopReason = null;
   PREP_ITEMS.forEach(p=>{ state.plac['prep_'+p.id] = {count:0, done:false}; });
   PLAC_TASKS.forEach(t=>{ state.plac[t.id] = {count:0, done:false}; });
@@ -730,6 +762,40 @@ function startEgzamin(){
 //  PHASE: HP
 // ═══════════════════════════════════════════════════════════
 let hpTimer = null, hpSeconds = 0, hpMaxSec = 0, hpClipActive = false;
+
+function drawHPClips() {
+  // Losuj 5 klipów z 30 — zasada: max 1 klip z grupy 17
+  const pool = [...HP_CLIPS];
+  const selected = [];
+  let group17used = false;
+
+  // Przetasuj
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+
+  for (const clip of pool) {
+    if (selected.length >= 5) break;
+    if (clip.group === 17) {
+      if (group17used) continue; // już mamy jeden z grupy 17
+      group17used = true;
+    }
+    selected.push({...clip, hits: [], done: false});
+  }
+
+  // Jeśli nie wylosowano 5 (np. za mało klipów spoza gr.17), uzupełnij
+  if (selected.length < 5) {
+    for (const clip of pool) {
+      if (selected.length >= 5) break;
+      if (!selected.find(s => s.file === clip.file)) {
+        selected.push({...clip, hits: [], done: false});
+      }
+    }
+  }
+
+  return selected;
+}
 
 function initHP(){
   document.getElementById('hp-kandydat-name').textContent = state.meta.kandydat;
@@ -878,7 +944,7 @@ function hpTap(event){
   const tRaw = video.currentTime || hpSeconds;
   const t = tRaw.toFixed(1);
   const c = state.hp.clips[state.hp.current];
-  const pts = calcHpScore(tRaw, c.winStart, c.winEnd);
+  const pts = calcHpScore(tRaw, c.winStart, c.winEnd, c.winStart2, c.winEnd2);
   c.hits.push({ t: parseFloat(t), pts });
 
   // Wizualna informacja o trafieniu
