@@ -325,11 +325,32 @@
   /* ── PDF styles (injected) ── */
   #pdf-frame { display: none; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 </head>
 <body>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- ══ SKANER QR ══ -->
+<div id="qr-scanner-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:200;flex-direction:column;align-items:center;justify-content:center">
+  <div style="color:var(--accent);font-family:var(--mono);font-size:.9rem;margin-bottom:16px;letter-spacing:1px">SKANUJ KOD QR KANDYDATA</div>
+  <div style="position:relative;width:280px;height:280px">
+    <video id="qr-cam" autoplay playsinline muted style="width:280px;height:280px;object-fit:cover;border-radius:12px;display:block"></video>
+    <canvas id="qr-canvas-scan" style="display:none"></canvas>
+    <!-- Ramka celownika -->
+    <div style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none">
+      <svg viewBox="0 0 280 280" style="width:100%;height:100%">
+        <path d="M30,10 L10,10 L10,30" stroke="var(--accent)" stroke-width="3" fill="none"/>
+        <path d="M250,10 L270,10 L270,30" stroke="var(--accent)" stroke-width="3" fill="none"/>
+        <path d="M10,250 L10,270 L30,270" stroke="var(--accent)" stroke-width="3" fill="none"/>
+        <path d="M270,250 L270,270 L250,270" stroke="var(--accent)" stroke-width="3" fill="none"/>
+      </svg>
+    </div>
+  </div>
+  <div id="qr-scan-status" style="color:var(--muted);font-size:.8rem;margin-top:16px;font-family:var(--mono)">Skieruj kamerę na kod QR</div>
+  <button onclick="closeScannerQR()" style="margin-top:20px;padding:12px 32px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--font);font-size:.9rem;cursor:pointer">✕ Anuluj</button>
+</div>
 <div id="qr-generator" style="display:none"></div>
 
 <!-- ══════ SCREEN 1: INTRO ══════ -->
@@ -347,7 +368,10 @@
 
     <div class="form-row">
       <label>Imię i nazwisko kandydata</label>
-      <input id="f-kandydat" type="text" placeholder="Jan Bukowiec" value="Jan Bukowiec">
+      <div style="display:flex;gap:8px">
+        <input id="f-kandydat" type="text" placeholder="Jan Bukowiec" value="Jan Bukowiec" style="flex:1">
+        <button type="button" onclick="openScannerQR()" style="padding:0 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--accent);font-size:1.1rem;cursor:pointer;flex-shrink:0" title="Skanuj QR kandydata">⬛</button>
+      </div>
     </div>
     <div class="form-row">
       <label>Nr PKK</label>
@@ -1515,6 +1539,73 @@ function generatePDF(){
 }
 function nowyEgzamin(){
   showScreen('intro');
+}
+
+// ══ SKANER QR KANDYDATA ══════════════════════════════════
+let qrScanInterval = null;
+let qrStream = null;
+
+function openScannerQR(){
+  const modal = document.getElementById('qr-scanner-modal');
+  modal.style.display = 'flex';
+  const video = document.getElementById('qr-cam');
+  document.getElementById('qr-scan-status').textContent = 'Uruchamianie kamery…';
+
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'environment', width: {ideal:640}, height: {ideal:640} }
+  }).then(stream => {
+    qrStream = stream;
+    video.srcObject = stream;
+    video.play();
+    document.getElementById('qr-scan-status').textContent = 'Skieruj kamerę na kod QR';
+    qrScanInterval = setInterval(scanFrameQR, 200);
+  }).catch(err => {
+    document.getElementById('qr-scan-status').textContent = '⚠ Brak dostępu do kamery: ' + err.message;
+  });
+}
+
+function scanFrameQR(){
+  const video = document.getElementById('qr-cam');
+  if(video.readyState !== video.HAVE_ENOUGH_DATA) return;
+  const canvas = document.getElementById('qr-canvas-scan');
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  if(typeof jsQR === 'undefined') return;
+  const code = jsQR(imageData.data, imageData.width, imageData.height, {inversionAttempts:'dontInvert'});
+  if(code) {
+    clearInterval(qrScanInterval);
+    parseQRData(code.data);
+    closeScannerQR();
+  }
+}
+
+function parseQRData(text){
+  let kandydat = '', pkk = '';
+  const lines = text.split('\n');
+  for(const line of lines){
+    const l = line.trim();
+    if(l.startsWith('Kandydat:'))  kandydat = l.slice(9).trim();
+    else if(l.startsWith('PKK:')) pkk = l.slice(4).trim();
+  }
+  if(!kandydat && text.includes('|')){
+    const parts = text.split('|');
+    kandydat = parts[0].trim();
+    if(parts[1] && parts[1].length > 3) pkk = parts[1].trim();
+  }
+  if(!kandydat) kandydat = text.trim().slice(0, 60);
+  if(kandydat) document.getElementById('f-kandydat').value = kandydat;
+  if(pkk)      document.getElementById('f-pkk').value = pkk;
+  toast('\u2713 Dane kandydata wczytane z QR');
+}
+function closeScannerQR(){
+  clearInterval(qrScanInterval);
+  if(qrStream) { qrStream.getTracks().forEach(t=>t.stop()); qrStream = null; }
+  const video = document.getElementById('qr-cam');
+  video.srcObject = null;
+  document.getElementById('qr-scanner-modal').style.display = 'none';
 }
 </script>
 </body>
