@@ -392,6 +392,41 @@
 </div>
  
 <!-- ══════ SCREEN 2: HP ══════ -->
+<!-- ══════ SCREEN HP-INTRO: Wyjaśnienie przed testem HP ══════ -->
+<div class="screen" id="screen-hp-intro">
+  <div class="hdr">
+    <div class="hdr-logo">DriveTab</div>
+    <div class="badge" style="background:var(--warn);color:#000">HP</div>
+    <span id="hpi-kandydat-name" style="font-size:.8rem;color:var(--muted);margin-left:8px"></span>
+  </div>
+ 
+  <div style="flex:1;display:flex;flex-direction:column;background:#000;position:relative">
+    <video id="hpi-video"
+      style="width:100%;flex:1;object-fit:contain;display:block"
+      playsinline preload="auto"
+      src="./wyjasnienie.mp4">
+    </video>
+    <div id="hpi-placeholder" style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#555;pointer-events:none">
+      <svg width="60" height="60" viewBox="0 0 80 80" fill="none"><rect x="8" y="18" width="64" height="44" rx="4" stroke="currentColor" stroke-width="3"/><polygon points="30,30 30,50 54,40" fill="currentColor"/></svg>
+      <p style="font-family:var(--mono);font-size:.8rem">Ładowanie wyjaśnienia…</p>
+    </div>
+  </div>
+ 
+  <div style="background:var(--surface);border-top:1px solid var(--border);padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+    <div style="font-size:.85rem;color:var(--text);line-height:1.5">
+      <b style="color:var(--warn)">Test Hazard Perception (HP)</b> — obejrzyj krótkie klipy wideo i dotknij ekranu gdy zauważysz zagrożenie na drodze. Wynik jest <b>diagnostyczny</b> i nie wpływa na rezultat egzaminu.
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="hpiSkip()" style="flex:1;padding:14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer">
+        ⏭ Pomiń wyjaśnienie
+      </button>
+      <button onclick="hpiStart()" style="flex:2;padding:14px;border-radius:var(--radius);border:none;background:var(--accent);color:#000;font-family:var(--font);font-size:.95rem;font-weight:700;cursor:pointer">
+        ▶ Rozpocznij test HP
+      </button>
+    </div>
+  </div>
+</div>
+ 
 <div class="screen" id="screen-hp">
   <div class="hdr">
     <div class="hdr-logo">DriveTab</div>
@@ -695,6 +730,28 @@ let hpTimer = null, hpSeconds = 0, hpMaxSec = 0, hpClipActive = false;
  
 function initHP(){
   document.getElementById('hp-kandydat-name').textContent = state.meta.kandydat;
+  document.getElementById('hpi-kandydat-name').textContent = state.meta.kandydat;
+  // Pokaż screen z wyjaśnieniem
+  showScreen('hp-intro');
+  // Załaduj wideo wyjaśnienia
+  const vid = document.getElementById('hpi-video');
+  const ph  = document.getElementById('hpi-placeholder');
+  vid.oncanplay = () => { ph.style.display = 'none'; vid.play().catch(()=>{}); };
+  vid.onerror   = () => { ph.querySelector('p').textContent = 'Brak pliku wyjasnienie.mp4'; };
+  vid.load();
+}
+ 
+function hpiSkip(){
+  const vid = document.getElementById('hpi-video');
+  vid.pause(); vid.src = '';
+  showScreen('hp');
+  loadHPClip(0);
+}
+ 
+function hpiStart(){
+  const vid = document.getElementById('hpi-video');
+  vid.pause(); vid.src = '';
+  showScreen('hp');
   loadHPClip(0);
 }
  
