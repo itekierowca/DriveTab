@@ -370,9 +370,7 @@
       <label>Imię i nazwisko kandydata</label>
       <div style="display:flex;gap:8px">
         <input id="f-kandydat" type="text" placeholder="Jan Bukowiec" value="Jan Bukowiec" style="flex:1">
-        <label style="padding:0 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--accent);font-size:1.1rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center" title="Skanuj QR kandydata">
-  ⬛<input type="file" accept="image/*" capture="environment" onchange="scanQRFromImage(this)" style="display:none">
-</label>
+        <button type="button" onclick="openScannerQR()" style="padding:0 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--accent);font-size:1.1rem;cursor:pointer;flex-shrink:0" title="Skanuj QR kandydata">⬛</button>
       </div>
     </div>
     <div class="form-row">
@@ -1551,39 +1549,6 @@ function nowyEgzamin(){
 // ══ SKANER QR KANDYDATA ══════════════════════════════════
 let qrScanInterval = null;
 let qrStream = null;
-
-function scanQRFromImage(input){
-  if(!input.files || !input.files[0]) return;
-  const file = input.files[0];
-  const url = URL.createObjectURL(file);
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = img.width; canvas.height = img.height;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    URL.revokeObjectURL(url);
-    if(typeof jsQR === 'undefined'){
-      // jsQR nie załadowane — spróbuj załadować dynamicznie
-      const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
-      s.onload = () => {
-        const code = jsQR(imageData.data, imageData.width, imageData.height);
-        if(code) parseQRData(code.data);
-        else toast('Nie znaleziono kodu QR na zdjęciu');
-      };
-      s.onerror = () => toast('⚠ Brak internetu — nie można załadować skanera');
-      document.head.appendChild(s);
-      return;
-    }
-    const code = jsQR(imageData.data, imageData.width, imageData.height, {inversionAttempts:'attemptBoth'});
-    if(code) parseQRData(code.data);
-    else toast('Nie znaleziono kodu QR — spróbuj ponownie');
-    input.value = '';
-  };
-  img.src = url;
-}
 
 function openScannerQR(){
   const modal = document.getElementById('qr-scanner-modal');
