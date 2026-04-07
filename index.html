@@ -532,6 +532,19 @@
   </div>
 </div>
 
+<!-- ══════ MODAL: POWÓD PRZERWANIA ══════ -->
+<div id="modal-przerwij" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:300;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border-radius:16px;padding:24px 20px;margin:20px;max-width:440px;width:100%">
+    <div style="font-size:1rem;font-weight:700;color:var(--danger);margin-bottom:2px">✕ PRZERWANIE EGZAMINU</div>
+    <div id="przerwij-faza" style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Powód przerwania</div>
+    <div id="przerwij-lista" style="display:flex;flex-direction:column;gap:8px;max-height:55vh;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px;padding-right:4px"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="anulujPrzerwij()" style="flex:1;padding:13px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--font);font-size:.9rem;cursor:pointer">Anuluj</button>
+      <button onclick="potwierdzPrzerwij()" style="flex:2;padding:13px;border-radius:var(--radius);border:none;background:var(--danger);color:#fff;font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer">✕ Przerwij egzamin</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════ SCREEN 4: WYNIK ══════ -->
 <div class="screen" id="screen-wynik">
   <div class="hdr">
@@ -773,7 +786,7 @@ function startEgzamin(){
 
   // reset state
   state.hp = { clips: drawHPClips(), current:0, done:false };
-  state.plac = {}; state.ruch = {}; state.verdict = null; state.stopReason = null;
+  state.plac = {}; state.ruch = {}; state.verdict = null; state.stopReason = null; state.stopPowody = []; state.placNegatywny = null;
   PREP_ITEMS.forEach(p=>{ state.plac['prep_'+p.id] = {count:0, done:false}; });
   PLAC_TASKS.forEach(t=>{ state.plac[t.id] = {count:0, done:false}; });
   RUCH_ERRORS.forEach(e=>{ state.ruch[e.id] = {count:0, done:false}; });
@@ -1118,9 +1131,18 @@ function incPlac(id, delta){
   if(s.count > 0) s.done = false;
   refreshPlacItem(id);
   updateStickyBar();
-  const fails = PLAC_TASKS.filter(t=>state.plac[t.id].count>=2).length;
-  if(state.plac[id].count>=2) toast('⚠ '+PLAC_TASKS.find(t=>t.id===id).name+' — 2× błąd');
-  if(fails>=2) toast('⚠ 2 zadania z dwukrotnym błędem — podstawa do negatywnego wyniku');
+  if(state.plac[id].count >= 2){
+    const nazwa = PLAC_TASKS.find(t=>t.id===id)?.name || id;
+    toast('✗ NEGATYWNY — ' + nazwa + ': 2× nieprawidłowe wykonanie', 4000);
+    state.placNegatywny = id; // zapamiętaj które zadanie zdecydowało
+    // Zablokuj przejście do ruchu i zmień kolor przycisku
+    const btn = document.getElementById('btn-next-phase');
+    if(btn){
+      btn.textContent = '✗ Negatywny — zakończ';
+      btn.style.background = 'var(--danger)';
+      btn.onclick = () => zakończEgzamin('plac_negatywny');
+    }
+  }
 }
 
 function refreshPlacItem(id){
@@ -1158,10 +1180,15 @@ function renderRuchErrors(){
 function incErr(id, delta){
   const s = state.ruch[id];
   s.count = Math.max(0, s.count + delta);
-  if(s.count > 0) s.done = false; // błąd anuluje "brak błędu"
+  if(s.count > 0) s.done = false;
   refreshErrItem(id);
   updateStickyBar();
-  if(s.count >= 2) toast(`⚠ ${RUCH_ERRORS.find(e=>e.id===id).label} — błąd dwukrotny`);
+  if(s.count >= 2){
+    const label = RUCH_ERRORS.find(e=>e.id===id)?.label || id;
+    // Zgodnie z §28: w ruchu egzaminator NIE informuje podczas jazdy
+    // Dyskretny toast bez słowa "NEGATYWNY" — egzamin trwa dalej
+    toast('⚠ ' + label + ' — 2× (odnotowano)', 2500);
+  }
 }
 
 function toggleDone(id){
@@ -1211,8 +1238,9 @@ function nextPhase(){
   if(currentPhase==='plac'){
     // check plac result
     const fails2 = PLAC_TASKS.filter(t=>state.plac[t.id].count>=2).length;
-    if(fails2>=2){
-      if(!confirm('Odnotowano 2+ niezdane zadania na placu. Czy mimo to przejść do ruchu drogowego?')) return;
+    if(fails2 > 0){
+      // Zadanie z 2× błędem = automatycznie negatywny, ale egzaminator może zdecydować o kontynuacji
+      if(!confirm('Odnotowano zadanie z 2× błędem na placu — wynik będzie NEGATYWNY.\nCzy mimo to kontynuować do ruchu drogowego?')) return;
     }
     currentPhase = 'ruch';
     document.getElementById('sec-ruch').style.display = 'block';
@@ -1226,10 +1254,63 @@ function nextPhase(){
   }
 }
 
+// Powody przerwania — dwie listy zależnie od fazy
+const POWODY_PLAC = [
+  { id:'pp1', text:'Przejechanie kołem przez linie zewnętrzne stanowiska' },
+  { id:'pp2', text:'Najechanie albo potrącenie pachołka lub tyczki' },
+  { id:'pp3', text:'Dwukrotne nieprawidłowe wykonanie tego samego zadania (poz. 1–11 zał. nr 1)' },
+  { id:'pp4', text:'Zachowanie mogące skutkować uszkodzeniem pojazdu, kolizją lub wypadkiem' },
+  { id:'pp5', text:'Zachowanie zagrażające bezpośrednio życiu lub zdrowiu uczestników ruchu' },
+  { id:'pp6', text:'Inny powód — opisz w uwagach' },
+];
+
+const POWODY_RUCH = [
+  { id:'pr1', text:'Spowodowanie kolizji lub wypadku / zachowanie mogące skutkować kolizją lub wypadkiem' },
+  { id:'pr2', text:'Omijanie pojazdu zatrzymanego w celu ustąpienia pierwszeństwa pieszym' },
+  { id:'pr3', text:'Wyprzedzanie na przejściu dla pieszych lub bezpośrednio przed nim' },
+  { id:'pr4', text:'Nieustąpienie pierwszeństwa pieszemu na oznakowanym przejściu dla pieszych' },
+  { id:'pr5', text:'Nieustąpienie pierwszeństwa pieszemu na skrzyżowaniu przy wjeździe na skrzyżowanie' },
+  { id:'pr6', text:'Jazda po torowisku tramwajowym w niedozwolonym miejscu lub kierunku' },
+  { id:'pr7', text:'Omijanie opuszczonych zapór lub półzapór na przejeździe kolejowym lub tramwajowym' },
+  { id:'pr8', text:'Nieustąpienie pierwszeństwa pojazdowi szynowemu' },
+  { id:'pr9', text:'Wjazd na skrzyżowanie przy czerwonym sygnale świetlnym' },
+  { id:'pr10',text:'Przekroczenie linii zatrzymania wyznaczonej przez sygnalizator lub znak STOP' },
+  { id:'pr11',text:'Niezatrzymanie się przed znakiem STOP' },
+  { id:'pr12',text:'Zachowanie zagrażające bezpośrednio życiu lub zdrowiu egzaminatora lub uczestnika ruchu' },
+  { id:'pr13',text:'Inny powód — opisz w uwagach' },
+];
+
 function stopEgzamin(){
-  if(confirm('Przerwać egzamin? Wynik będzie NEGATYWNY.')){
-    zakończEgzamin('przerwany');
+  // Renderuj checkboxy
+  const lista = document.getElementById('przerwij-lista');
+  const powody = currentPhase === 'plac' ? POWODY_PLAC : POWODY_RUCH;
+  const faza = currentPhase === 'plac' ? 'Plac manewrowy' : 'Ruch drogowy';
+  document.getElementById('przerwij-faza').textContent = 'Powód przerwania — ' + faza;
+  lista.innerHTML = powody.map(p =>
+    '<label style="display:flex;gap:10px;align-items:flex-start;background:var(--surface2);border-radius:10px;padding:10px;cursor:pointer">' +
+    '<input type="checkbox" id="cb_'+p.id+'" style="margin-top:2px;width:18px;height:18px;flex-shrink:0;accent-color:var(--danger)">' +
+    '<span style="font-size:.82rem;line-height:1.4;color:var(--text)">'+p.text+'</span></label>'
+  ).join('');
+  document.getElementById('modal-przerwij').style.display = 'flex';
+}
+
+function anulujPrzerwij(){
+  document.getElementById('modal-przerwij').style.display = 'none';
+}
+
+function potwierdzPrzerwij(){
+  const powody = currentPhase === 'plac' ? POWODY_PLAC : POWODY_RUCH;
+  const zaznaczone = powody
+    .filter(p => document.getElementById('cb_'+p.id)?.checked)
+    .map(p => p.text);
+  if(zaznaczone.length === 0){
+    toast('Zaznacz co najmniej jeden powód przerwania');
+    return;
   }
+  state.stopReason = 'przerwany';
+  state.stopPowody = zaznaczone;
+  document.getElementById('modal-przerwij').style.display = 'none';
+  zakończEgzamin('przerwany');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1241,11 +1322,12 @@ function zakończEgzamin(reason){
   const dur = Math.round((state.meta.tsEnd - state.meta.tsStart)/60000);
 
   // ─ Oblicz wynik ─
+  // PLAC: negatywny gdy KTÓREKOLWIEK zadanie wykonane 2× nieprawidłowo
   const placFails2 = PLAC_TASKS.filter(t=>state.plac[t.id].count>=2).length;
+  // RUCH: negatywny gdy KTÓREKOLWIEK zadanie wykonane 2× nieprawidłowo
   const ruchDoubles = RUCH_ERRORS.filter(e=>state.ruch[e.id].count>=2).length;
-  const directDanger = false; // przerwanie przez egzaminatora obsługiwane przez btn PRZERWIJ
-  const interrupted = reason==='przerwany';
-  const positive = !interrupted && placFails2 < 2 && ruchDoubles === 0 && !directDanger;
+  const interrupted = reason==='przerwany' || reason==='plac_negatywny';
+  const positive = !interrupted && placFails2 === 0 && ruchDoubles === 0;
 
   state.verdict = positive ? 'POZYTYWNY' : 'NEGATYWNY';
 
@@ -1255,7 +1337,21 @@ function zakończEgzamin(reason){
   vEl.className = 'wynik-verdict ' + (positive?'pozytywny':'negatywny');
 
   let sub = positive ? 'Kandydat zdał egzamin praktyczny' : 'Kandydat nie zdał egzaminu praktycznego';
-  if(interrupted) sub += ' — egzamin przerwany';
+  if(reason === 'plac_negatywny'){
+    const nazwa = PLAC_TASKS.find(t=>t.id===state.placNegatywny)?.name || '';
+    sub += ' — dwukrotny błąd na placu: ' + nazwa;
+  } else if(interrupted && state.stopPowody && state.stopPowody.length > 0){
+    sub += ' — przerwano: ' + state.stopPowody[0];
+    if(state.stopPowody.length > 1) sub += ' (+' + (state.stopPowody.length-1) + ')';
+  } else if(interrupted){
+    sub += ' — egzamin przerwany';
+  } else if(placFails2 > 0){
+    const t = PLAC_TASKS.find(t=>state.plac[t.id].count>=2);
+    sub += ' — dwukrotny błąd: ' + (t?.name||'');
+  } else if(ruchDoubles > 0){
+    const e = RUCH_ERRORS.find(e=>state.ruch[e.id].count>=2);
+    sub += ' — dwukrotny błąd: ' + (e?.label||'');
+  }
   document.getElementById('wy-sub').textContent = sub;
 
   // HP summary
