@@ -1428,10 +1428,20 @@ function generatePDF(){
   function ocena(id){
     const s = state.plac[id] || {count:0,done:false};
     const n = s.count;
-    const n1 = n>=1 ? '1&#x2611;' : '1&#x25A1;';
-    const n2 = n>=2 ? '2&#x2611;' : '2&#x25A1;';
-    const poz = (n===0 && s.done) ? '&#x2611;' : '&#x25A1;';
-    return `<span class="sym">${n1}</span><span class="sym">${n2}</span><span class="sym poz">${poz}</span>`;
+    // 1□ — czerwony gdy błąd, szary gdy brak
+    const n1 = n>=1
+      ? '1<span style="color:#c0392b;font-weight:bold">&#x2611;</span>'
+      : '1&#x25A1;';
+    // 2□ — czerwony gdy 2. błąd
+    const n2 = n>=2
+      ? '2<span style="color:#c0392b;font-weight:bold">&#x2611;</span>'
+      : '2&#x25A1;';
+    // P□ — zielony gdy brak błędów i done, lub gdy 1 błąd ale zaliczone (nie negatywny)
+    const zaliczone = (n===0 && s.done) || (n===1);
+    const poz = zaliczone
+      ? '<span style="color:#1a6b3a;font-weight:bold">&#x2611;</span>'
+      : '&#x25A1;';
+    return '<span class="sym">'+n1+'</span><span class="sym">'+n2+'</span><span class="sym poz">'+poz+'</span>';
   }
 
   // Pełna lista zadań placu (wg arkusza — kat. B)
@@ -1487,10 +1497,18 @@ function generatePDF(){
   function ruchOcena(pdfId){
     const s = state.ruch[pdfId] || {count:0, done:false};
     const n = s.count;
-    const n1 = n>=1 ? '1&#x2611;' : '1&#x25A1;';
-    const n2 = n>=2 ? '2&#x2611;' : '2&#x25A1;';
-    const poz = (n===0 && s.done) ? '&#x2611;' : (n===0 && !s.done) ? '&#x25A1;' : '&#x25A1;';
-    return `<span class="sym">${n1}</span><span class="sym">${n2}</span><span class="sym poz">${poz}</span>`;
+    const n1 = n>=1
+      ? '1<span style="color:#c0392b;font-weight:bold">&#x2611;</span>'
+      : '1&#x25A1;';
+    const n2 = n>=2
+      ? '2<span style="color:#c0392b;font-weight:bold">&#x2611;</span>'
+      : '2&#x25A1;';
+    // zielony gdy brak błędów i done, LUB gdy 1 błąd (ostrzeżenie ale zaliczone)
+    const zaliczone = (n===0 && s.done) || (n===1);
+    const poz = zaliczone
+      ? '<span style="color:#1a6b3a;font-weight:bold">&#x2611;</span>'
+      : '&#x25A1;';
+    return '<span class="sym">'+n1+'</span><span class="sym">'+n2+'</span><span class="sym poz">'+poz+'</span>';
   }
 
   // HP score
@@ -1598,7 +1616,17 @@ function generatePDF(){
           ruchRight,
         '</table>',
         T('div class="sec-hdr" style="margin-top:4px">') + 'Uwagi:' + '</div>',
-        T('div class="uwagi-box">') + '&nbsp;' + '</div>',
+        T('div class="uwagi-box">') + (() => {
+          if(state.stopReason === 'przerwany' && state.stopPowody && state.stopPowody.length > 0){
+            return '<b style="color:#c0392b">Egzamin przerwany.</b> Powód: ' +
+              state.stopPowody.map((p,i) => (i+1)+'. '+p).join('; ');
+          }
+          if(state.stopReason === 'plac_negatywny' && state.placNegatywny){
+            const nazwa = PLAC_TASKS.find(t=>t.id===state.placNegatywny)?.name || state.placNegatywny;
+            return '<b style="color:#c0392b">Wynik negatywny na placu.</b> Dwukrotny błąd: ' + nazwa;
+          }
+          return '&nbsp;';
+        })() + '</div>',
         T('div class="wynik-row">'),
           T('div>'),
             T('div class="wynik-txt">') + 'Wynik egzaminu' + '</div>',
