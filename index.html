@@ -813,6 +813,7 @@ function startEgzamin(){
 //  PHASE: HP
 // ═══════════════════════════════════════════════════════════
 let hpTimer = null, hpSeconds = 0, hpMaxSec = 0, hpClipActive = false;
+let clipPlayStartTime = 0; // Date.now() gdy klip faktycznie startuje
 
 function drawHPClips() {
   // Zasada: zestaw 5 klipów = dokładnie 1 z grupy 17 + 4 losowe spoza grupy 17
@@ -875,6 +876,7 @@ function loadHPClip(idx){
   clearInterval(hpTimer);
   hpClipActive = false;
   hpSeconds = 0;
+  clipPlayStartTime = 0;
 
   const video = document.getElementById('hp-video');
   const placeholder = document.getElementById('hp-placeholder');
@@ -905,6 +907,7 @@ function loadHPClip(idx){
       document.getElementById('hp-clip-info').textContent =
         `▶ ${clip.name} — DOTKNIJ gdy widzisz zagrożenie`;
       hpClipActive = true;
+      clipPlayStartTime = Date.now();
       video.play().catch(()=>{});
       hpTimer = setInterval(() => hpTickTimer(video), 100);
     }
@@ -926,6 +929,7 @@ function loadHPClip(idx){
     const playPromise = video.play();
     if (playPromise !== undefined) {
       playPromise.then(() => {
+        clipPlayStartTime = Date.now();
         hpTimer = setInterval(() => hpTickTimer(video), 100);
       }).catch(() => {
         // iOS zablokował autoplay — czekaj na tap
@@ -936,6 +940,7 @@ function loadHPClip(idx){
         const tapToPlay = () => {
           video.play().then(() => {
             hpClipActive = true;
+            clipPlayStartTime = Date.now();
             hpTimer = setInterval(() => hpTickTimer(video), 100);
             document.getElementById('hp-clip-info').textContent =
               `▶ ${clip.name} — DOTKNIJ gdy widzisz zagrożenie`;
@@ -984,7 +989,10 @@ function hpTap(event){
   ring.style.animation = 'tapRing .5s ease-out forwards';
 
   const video = document.getElementById('hp-video');
-  const tRaw = video.currentTime || hpSeconds;
+  // Czas od momentu gdy kandydat zaczął oglądać klip (niezależnie od czasu ładowania)
+  const tRaw = clipPlayStartTime > 0
+    ? (Date.now() - clipPlayStartTime) / 1000
+    : (video.currentTime || hpSeconds);
   const t = tRaw.toFixed(1);
   const c = state.hp.clips[state.hp.current];
   const pts = calcHpScore(tRaw, c.winStart, c.winEnd, c.winStart2, c.winEnd2);
