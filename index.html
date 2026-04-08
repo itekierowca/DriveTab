@@ -1400,6 +1400,8 @@ function zakończEgzamin(reason){
   if(!hasErr) errList.innerHTML += '<div style="color:var(--ok);font-size:.85rem">Brak odnotowanych błędów</div>';
 
   showScreen('wynik');
+  // Inicjalizuj canvas podpisu po pokazaniu ekranu wyniku
+  setTimeout(initSignature, 100);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1832,7 +1834,7 @@ function closeScannerQR(){
 }
 
 // Inicjalizuj datę po załadowaniu wszystkiego
-window.addEventListener("load", ()=>{initDateTime();initSignature();});
+window.addEventListener("load", initDateTime);
 initDateTime();
 </script>
 </body>
