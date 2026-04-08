@@ -196,7 +196,8 @@
   .err-grid { display: grid; gap: 8px; }
   .is-tablet .err-grid { grid-template-columns: 1fr 1fr; }
   .is-tablet #plac-tasks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .is-tablet .prep-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .is-tablet .prep-grid { grid-template-columns: 1fr 1fr; }
+  .is-tablet .prep-grid .err-item { font-size: .82rem; }
   .is-tablet .err-item { min-height: 52px; }
   .is-tablet .inc-btn { width: 40px; height: 40px; }
   .err-item {
@@ -744,7 +745,7 @@ function initDateTime(){
 const isIPad = /iPad/.test(navigator.userAgent) ||
   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isIPhone = /iPhone/.test(navigator.userAgent);
-const isTablet = isIPad || (window.screen.width >= 768 && 'ontouchstart' in window);
+const isTablet = isIPad || (window.screen.width >= 768 && window.screen.height >= 768 && 'ontouchstart' in window);
 
 // Dostosuj układ do urządzenia
 if (isTablet) {
