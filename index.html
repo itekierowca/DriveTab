@@ -1649,13 +1649,26 @@ function generatePDF(){
   // Użyj Blob URL zamiast document.write — bezpieczne dla iOS Safari
   const blob = new Blob([html], {type: 'text/html'});
   const blobUrl = URL.createObjectURL(blob);
-  // Otwórz mailto bezpośrednio
+  // Otwórz PDF w nowej karcie
+  window.open(blobUrl, '_blank');
+
+  // Po 15 sekundach otwórz klienta email
   if(emailWORD){
     const sub=encodeURIComponent('Arkusz egzaminu '+(state.meta.kandydat||'')+' '+(state.meta.data||'')+' — '+(state.verdict||''));
     const bod=encodeURIComponent('Kandydat: '+(state.meta.kandydat||'')+'\nPKK: '+(state.meta.pkk||'')+'\nData: '+(state.meta.data||'')+' '+(state.meta.godzina||'')+'\nWynik: '+(state.verdict||'')+'\nEgzaminator: '+(state.meta.egzaminator||'')+'\n\nWygenerowano przez DriveTab v1.0');
-    setTimeout(()=>{
-      window.location.href='mailto:'+emailWORD+'?subject='+sub+'&body='+bod;
-    },600);
+
+    // Odliczanie — toast co sekundę
+    let remaining = 15;
+    toast('✉ Email otworzy się za '+remaining+'s…', 1200);
+    const ticker = setInterval(()=>{
+      remaining--;
+      if(remaining > 0){
+        toast('✉ Email otworzy się za '+remaining+'s…', 1200);
+      } else {
+        clearInterval(ticker);
+        window.location.href='mailto:'+emailWORD+'?subject='+sub+'&body='+bod;
+      }
+    },1000);
   }
 
   if(!win) {
