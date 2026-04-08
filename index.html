@@ -698,7 +698,10 @@ function calcHpScore(t, winStart, winEnd, winStart2, winEnd2) {
   }
   const s1 = scoreWindow(t, winStart, winEnd);
   const s2 = (winStart2 !== undefined) ? scoreWindow(t, winStart2, winEnd2) : 0;
-  return Math.max(s1, s2);
+  // Zwróć który window trafiono (dla klipów z dwoma zagrożeniami)
+  if (s1 > 0) return { pts: s1, win: 1 };
+  if (s2 > 0) return { pts: s2, win: 2 };
+  return { pts: 0, win: 0 };
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -995,14 +998,23 @@ function hpTap(event){
     : (video.currentTime || hpSeconds);
   const t = tRaw.toFixed(1);
   const c = state.hp.clips[state.hp.current];
-  const pts = calcHpScore(tRaw, c.winStart, c.winEnd, c.winStart2, c.winEnd2);
-  c.hits.push({ t: parseFloat(t), pts });
+  const result = calcHpScore(tRaw, c.winStart, c.winEnd, c.winStart2, c.winEnd2);
+  const pts = result.pts;
+  const win = result.win;
+
+  // Dla klipów z dwoma zagrożeniami: jedno tapnięcie per okno
+  // Ignoruj tap jeśli to okno już zostało trafione
+  if (win > 0 && c.hits.some(h => h.win === win)) {
+    return; // to zagrożenie już zarejestrowane — ignoruj kolejne tapnięcia
+  }
+  c.hits.push({ t: parseFloat(t), pts, win });
 
   // Wizualna informacja o trafieniu
   const li = document.createElement('div');
   li.className = 'hp-hit';
   if (pts > 0) {
-    li.textContent = `✓ ${t}s → ${pts} pkt`;
+    const winLabel = c.winStart2 !== undefined ? ` (zagrożenie ${win})` : '';
+    li.textContent = `✓ ${t}s${winLabel} → ${pts} pkt`;
     li.style.color = pts >= 4 ? 'var(--ok)' : pts >= 2 ? 'var(--warn)' : '#aaa';
   } else {
     li.textContent = `✗ ${t}s — poza oknem`;
@@ -1369,7 +1381,10 @@ function zakończEgzamin(reason){
   const hpTotal = state.hp.clips ? state.hp.clips.length : 0;
   const hpPts = state.hp.done
     ? state.hp.clips.reduce((sum, cl) => {
-        const best = cl.hits.reduce((mx, h) => Math.max(mx, h.pts||0), 0);
+        // Dla klipów z 2 zagrożeniami: sumuj najlepszy hit z każdego okna
+        const best1 = cl.hits.filter(h=>h.win!==2).reduce((mx,h)=>Math.max(mx,h.pts||0),0);
+        const best2 = cl.hits.filter(h=>h.win===2).reduce((mx,h)=>Math.max(mx,h.pts||0),0);
+        const best = best1 + best2;
         return sum + best;
       }, 0)
     : null;
@@ -1440,7 +1455,7 @@ function generatePDF(){
     '\nWORD: ' + m.word +
     '\nPojazd: ' + m.pojazd +
     '\nWynik: ' + state.verdict +
-    '\nHP: ' + (state.hp.done ? state.hp.clips.reduce((s,cl)=>s+cl.hits.reduce((mx,h)=>h.pts>mx?h.pts:mx,0),0)+'/30' : 'brak')
+    '\nHP: ' + (state.hp.done ? state.hp.clips.reduce((s,cl)=>s+(cl.hits.filter(h=>h.win!==2).reduce((mx,h)=>Math.max(mx,h.pts||0),0)+cl.hits.filter(h=>h.win===2).reduce((mx,h)=>Math.max(mx,h.pts||0),0)),0)+'/30' : 'brak')
   );
   const qrDataUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=' + qrContent;
 
@@ -1519,7 +1534,7 @@ function generatePDF(){
 
   // HP score
   const hpPts = state.hp.done
-    ? state.hp.clips.reduce((s,cl)=>s+cl.hits.reduce((mx,h)=>h.pts>mx?h.pts:mx,0),0)
+    ? state.hp.clips.reduce((s,cl)=>s+(cl.hits.filter(h=>h.win!==2).reduce((mx,h)=>Math.max(mx,h.pts||0),0)+cl.hits.filter(h=>h.win===2).reduce((mx,h)=>Math.max(mx,h.pts||0),0)),0)
     : null;
 
   // Generuj wiersze lewej kolumny (plac + pierwsze 14 ruch)
