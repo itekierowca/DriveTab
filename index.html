@@ -1408,6 +1408,12 @@ function generatePDF(){
   const emailWORD='arkusze_egzaminacyjne@prawko.pl';
   const sigDataURL=getSignatureDataURL();
   if(!sigDataURL&&!confirm('Brak podpisu egzaminatora. Wygenerować PDF bez podpisu?')) return;
+
+  // Pokaż spinner i odrocz generowanie żeby UI zdążył się odświeżyć
+  const btnPdf = document.querySelector('.btn-pdf');
+  if(btnPdf){ btnPdf.textContent='⏳ Generowanie…'; btnPdf.disabled=true; }
+  setTimeout(function(){
+  // === WŁAŚCIWE GENEROWANIE PDF ===
   const m = state.meta;
   const positive = state.verdict==='POZYTYWNY';
   const dur = Math.round(((m.tsEnd||Date.now()) - m.tsStart)/60000);
@@ -1679,8 +1685,8 @@ function generatePDF(){
   }
 
   // Reset przycisku
-  const btnPdf = document.querySelector('.btn-pdf');
   if(btnPdf){ btnPdf.textContent='✍ Podpisz i wyślij PDF'; btnPdf.disabled=false; }
+  }, 60); // koniec setTimeout
 }
 function nowyEgzamin(){
   showScreen('intro');
