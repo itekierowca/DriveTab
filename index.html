@@ -334,7 +334,7 @@
 
 <!-- ══ SKANER QR ══ -->
 <div id="qr-scanner-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:200;flex-direction:column;align-items:center;justify-content:center">
-  <div style="color:var(--accent);font-family:var(--mono);font-size:.9rem;margin-bottom:16px;letter-spacing:1px">SKANUJ KOD QR KANDYDATA</div>
+  <div style="color:var(--accent);font-family:var(--mono);font-size:.9rem;margin-bottom:16px;letter-spacing:1px" id="qr-scan-title">SKANUJ KOD QR KANDYDATA</div>
   <div style="position:relative;width:280px;height:280px">
     <video id="qr-cam" autoplay playsinline muted style="width:280px;height:280px;object-fit:cover;border-radius:12px;display:block"></video>
     <canvas id="qr-canvas-scan" style="display:none"></canvas>
@@ -407,6 +407,7 @@
         <input id="f-pojazd" type="text" placeholder="Suzuki Swift WA1234B">
       </div>
     </div>
+
     <div class="form-row">
       <label>Faza startowa</label>
       <select id="f-faza">
@@ -565,7 +566,15 @@
 
   <div class="wynik-errs" id="wynik-errs-list"></div>
 
-  <button class="btn-pdf" onclick="generatePDF()">⬇ Generuj arkusz PDF</button>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin:0 16px 12px;padding:12px">
+    <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Podpis egzaminatora</div>
+    <canvas id="sig-canvas" width="600" height="120" style="width:100%;height:100px;border:1px dashed var(--border);border-radius:8px;background:#fff;touch-action:none;display:block"></canvas>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onclick="clearSignature()" style="flex:1;padding:8px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--font);font-size:.8rem;cursor:pointer">&#x2715; Wyczyść</button>
+      <div id="sig-status" style="flex:2;padding:8px;font-size:.8rem;color:var(--muted);text-align:center;align-self:center">Podpisz palcem powyżej</div>
+    </div>
+  </div>
+  <button class="btn-pdf" onclick="generatePDF()">&#x270D; Podpisz i wyślij PDF</button>
   <button class="btn-new" onclick="nowyEgzamin()">+ Nowy egzamin</button>
   <div style="height:40px"></div>
 </div>
@@ -644,10 +653,10 @@ const RUCH_ERRORS = [
 
 // Ścieżka do folderu z klipami — zmień jeśli przeniesiesz folder
 const HP_CLIPS = [
-  // Grupa 1-16, 18-47 — może wchodzić do losowania swobodnie
-  { name:'Klip 02',  file:'klip02.mp4',  group:2,  winStart:19.33, winEnd:25 },
-  { name:'Klip 02b', file:'klip02.mp4',  group:2,  winStart:17.67, winEnd:24.33 },
-  { name:'Klip 03',  file:'klp03.mp4',   group:3,  winStart:16.33, winEnd:19.67 },
+  // ── Klipy bez grupy 17 — losowane swobodnie ──────────────────
+  { name:'Klip 01',  file:'klip01.mp4',  group:1,  winStart:19.33, winEnd:25 },
+  { name:'Klip 02',  file:'klip02.mp4',  group:2,  winStart:17.67, winEnd:24.33 },
+  { name:'Klip 03',  file:'klip03.mp4',  group:3,  winStart:16.33, winEnd:19.67 },
   { name:'Klip 04',  file:'klip04.mp4',  group:4,  winStart:14.33, winEnd:17.67 },
   { name:'Klip 05',  file:'klip05.mp4',  group:5,  winStart:18.33, winEnd:23.33 },
   { name:'Klip 06',  file:'klip06.mp4',  group:6,  winStart:18.33, winEnd:23.33 },
@@ -656,14 +665,6 @@ const HP_CLIPS = [
   { name:'Klip 10',  file:'klip10.mp4',  group:10, winStart:15.67, winEnd:20 },
   { name:'Klip 14',  file:'klip14.mp4',  group:14, winStart:15.67, winEnd:18.67 },
   { name:'Klip 15',  file:'klip15.mp4',  group:15, winStart:16,    winEnd:19.67 },
-  // Grupa 17 — max 1 z poniższych w zestawie
-  { name:'Klip 17',  file:'klip17.mp4',  group:17, winStart:23.33, winEnd:28 },
-  { name:'Klip 17A', file:'klip17A.mp4', group:17, winStart:23.33, winEnd:28 },
-  { name:'Klip 17B', file:'klip17B.mp4', group:17, winStart:23.33, winEnd:28 },
-  { name:'Klip 17C', file:'klip17C.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
-  { name:'Klip 17D', file:'klip17D.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
-  { name:'Klip 17E', file:'klip17E.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
-  // Pozostałe grupy
   { name:'Klip 18',  file:'klip18.mp4',  group:18, winStart:18.33, winEnd:22.33 },
   { name:'Klip 19',  file:'klip19.mp4',  group:19, winStart:12.67, winEnd:18 },
   { name:'Klip 20',  file:'klip20.mp4',  group:20, winStart:18,    winEnd:21.67 },
@@ -677,6 +678,13 @@ const HP_CLIPS = [
   { name:'Klip 36',  file:'klip36.mp4',  group:36, winStart:17.67, winEnd:22.67 },
   { name:'Klip 43',  file:'klip43.mp4',  group:43, winStart:17,    winEnd:21 },
   { name:'Klip 47',  file:'klip47.mp4',  group:47, winStart:14,    winEnd:18 },
+  // ── Grupa 17 — zawsze 1 z poniższych, zawsze dwa okna ────────
+  { name:'Klip 17',  file:'klip17.mp4',  group:17, winStart:23.33, winEnd:28,    winStart2:36, winEnd2:41.67 },
+  { name:'Klip 17A', file:'klip17A.mp4', group:17, winStart:23.33, winEnd:28,    winStart2:36, winEnd2:41.67 },
+  { name:'Klip 17B', file:'klip17B.mp4', group:17, winStart:23.33, winEnd:28,    winStart2:36, winEnd2:41.67 },
+  { name:'Klip 17C', file:'klip17C.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
+  { name:'Klip 17D', file:'klip17D.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
+  { name:'Klip 17E', file:'klip17E.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
 ];
 
 // Oblicz punkty za trafienie w oknie czasowym (obsługuje 2 okna)
@@ -805,37 +813,29 @@ function startEgzamin(){
 let hpTimer = null, hpSeconds = 0, hpMaxSec = 0, hpClipActive = false;
 
 function drawHPClips() {
-  // Losuj 5 klipów z 30 — zasada: max 1 klip z grupy 17
-  const pool = [...HP_CLIPS];
-  const selected = [];
-  let group17used = false;
+  // Zasada: zestaw 5 klipów = dokładnie 1 z grupy 17 + 4 losowe spoza grupy 17
+  // Klip gr.17 ma zawsze 2 okna → max pkt za ten klip = 10, łącznie max = 4×5 + 10 = 30
 
-  // Przetasuj
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-
-  for (const clip of pool) {
-    if (selected.length >= 5) break;
-    if (clip.group === 17) {
-      if (group17used) continue; // już mamy jeden z grupy 17
-      group17used = true;
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
     }
-    selected.push({...clip, hits: [], done: false});
+    return a;
   }
 
-  // Jeśli nie wylosowano 5 (np. za mało klipów spoza gr.17), uzupełnij
-  if (selected.length < 5) {
-    for (const clip of pool) {
-      if (selected.length >= 5) break;
-      if (!selected.find(s => s.file === clip.file)) {
-        selected.push({...clip, hits: [], done: false});
-      }
-    }
-  }
+  // 1. Wylosuj 1 klip z grupy 17
+  const pool17   = HP_CLIPS.filter(c => c.group === 17);
+  const poolRest = HP_CLIPS.filter(c => c.group !== 17);
 
-  return selected;
+  const klip17   = pool17[Math.floor(Math.random() * pool17.length)];
+  const rest4    = shuffle(poolRest).slice(0, 4);
+
+  // 2. Połącz i przetasuj kolejność prezentacji
+  const selected = shuffle([klip17, ...rest4]);
+
+  return selected.map(c => ({...c, hits: [], done: false}));
 }
 
 function initHP(){
@@ -1365,7 +1365,7 @@ function zakończEgzamin(reason){
     : null;
   const hpEl = document.getElementById('wy-hp-chip');
   hpEl.textContent = state.hp.done
-    ? `HP: ${hpPts}/25 pkt — ${hpHits}/${hpTotal} klipów`
+    ? `HP: ${hpPts}/30 pkt — ${hpHits}/${hpTotal} klipów`
     : 'HP: nie przeprowadzono';
 
   document.getElementById('wy-kandydat').textContent = state.meta.kandydat;
@@ -1405,6 +1405,9 @@ function zakończEgzamin(reason){
 //  PDF GENERATOR — układ zgodny z Rozp. MI 2023 poz. 2659
 // ═══════════════════════════════════════════════════════════
 function generatePDF(){
+  const emailWORD='arkusze_egzaminacyjne@prawko.pl';
+  const sigDataURL=getSignatureDataURL();
+  if(!sigDataURL&&!confirm('Brak podpisu egzaminatora. Wygenerować PDF bez podpisu?')) return;
   const m = state.meta;
   const positive = state.verdict==='POZYTYWNY';
   const dur = Math.round(((m.tsEnd||Date.now()) - m.tsStart)/60000);
@@ -1420,7 +1423,7 @@ function generatePDF(){
     '\nWORD: ' + m.word +
     '\nPojazd: ' + m.pojazd +
     '\nWynik: ' + state.verdict +
-    '\nHP: ' + (state.hp.done ? state.hp.clips.reduce((s,cl)=>s+cl.hits.reduce((mx,h)=>h.pts>mx?h.pts:mx,0),0)+'/25' : 'brak')
+    '\nHP: ' + (state.hp.done ? state.hp.clips.reduce((s,cl)=>s+cl.hits.reduce((mx,h)=>h.pts>mx?h.pts:mx,0),0)+'/30' : 'brak')
   );
   const qrDataUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=' + qrContent;
 
@@ -1528,7 +1531,7 @@ function generatePDF(){
 
   const hpSection = state.hp.done ? (
     '<tr style="background:#eef7ee"><td colspan="3" style="padding:3px 4px;font-size:7pt;color:#1a6b3a">' +
-    '<b>TEST HP (diagnostyczny):</b> ' + hpPts + '/25 pkt \u2014 nie wp\u0142ywa na wynik egzaminu' +
+    '<b>TEST HP (diagnostyczny):</b> ' + hpPts + '/30 pkt \u2014 nie wp\u0142ywa na wynik egzaminu' +
     '</td></tr>'
   ) : '';
 
@@ -1632,13 +1635,13 @@ function generatePDF(){
             T('div class="wynik-txt">') + 'Wynik egzaminu' + '</div>',
             T('div style="font-size:6.5pt;color:#555;margin-top:2px">') + 'Egzaminator: ' + m.egzaminator + ' | Nr upraw.: ' + m.nrEg + '</div>',
             T('div style="font-size:6.5pt;color:#555">') + 'Pojazd: ' + m.pojazd + '</div>',
-            T('div style="font-size:6.5pt;color:#555;margin-top:2px">') + 'HP: ' + (hpPts !== null ? hpPts + '/25 pkt' : 'nie przeprowadzono') + '</div>',
+            T('div style="font-size:6.5pt;color:#555;margin-top:2px">') + 'HP: ' + (hpPts !== null ? hpPts + '/30 pkt' : 'nie przeprowadzono') + '</div>',
           '</div>',
           (qrDataUrl ? T('img src="') + qrDataUrl + '" width="90" height="90" style="display:block;margin:0 8px 0 6px;flex-shrink:0">' : ''),
           T('div class="wynik-val">') + state.verdict + '</div>',
         '</div>',
         T('div style="display:flex;justify-content:flex-end;padding:4px">'),
-          T('div class="sign-area">') + '............................................' + T('br>') + '(podpis i piecz\u0119\u0107 egzaminatora)' + '</div>',
+          T('div class="sign-area">') + (sigDataURL ? T('img src="')+sigDataURL+'" style="max-width:170px;max-height:55px;display:block;margin:0 auto 2px">' : '............................................') + T('br>') + '(podpis i pieczęć egzaminatora)' + '</div>',
         '</div>',
       '</div>',
     '</div>',
@@ -1658,7 +1661,20 @@ function generatePDF(){
   const win = window.open(blobUrl, '_blank');
   if(win) {
     win.addEventListener('load', () => { setTimeout(()=>win.print(), 400); });
-  } else {
+  }
+
+  // Wyślij email do WORD
+  if(emailWORD){
+    const sub=encodeURIComponent('Arkusz egzaminu '+(state.meta.kandydat||'')+' '+(state.meta.data||'')+' — '+(state.verdict||''));
+    const bod=encodeURIComponent('Kandydat: '+(state.meta.kandydat||'')+'\nPKK: '+(state.meta.pkk||'')+'\nData: '+(state.meta.data||'')+' '+(state.meta.godzina||'')+'\nWynik: '+(state.verdict||'')+'\nEgzaminator: '+(state.meta.egzaminator||'')+'\n\nArkusz PDF jest otwarty w nowej karcie — zapisz go i dołącz do wiadomości.\nDriveTab v1.0');
+    setTimeout(()=>{
+      if(confirm('Otworzyć klienta email?\nAdresat: '+emailWORD)){
+        window.location.href='mailto:'+emailWORD+'?subject='+sub+'&body='+bod;
+      }
+    },800);
+  }
+
+  if(!win) {
     // Fallback: pobierz jako plik
     const a = document.createElement('a');
     a.href = blobUrl; a.download = 'arkusz_' + m.kandydat.replace(/ /g,'_') + '.html';
@@ -1668,13 +1684,44 @@ function generatePDF(){
 function nowyEgzamin(){
   showScreen('intro');
   initDateTime();
+  clearSignature();
+}
+
+function initSignature(){
+  const cv=document.getElementById('sig-canvas');
+  if(!cv||cv._ok) return; cv._ok=true;
+  const ctx=cv.getContext('2d');
+  ctx.strokeStyle='#111'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round';
+  let dr=false,lx=0,ly=0;
+  function gp(e){ const r=cv.getBoundingClientRect(),sx=cv.width/r.width,sy=cv.height/r.height,s=e.touches?e.touches[0]:e; return{x:(s.clientX-r.left)*sx,y:(s.clientY-r.top)*sy}; }
+  function dn(e){ e.preventDefault(); dr=true; const p=gp(e); lx=p.x; ly=p.y; }
+  function mv(e){ e.preventDefault(); if(!dr) return; const p=gp(e); ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y); ctx.stroke(); lx=p.x; ly=p.y; const st=document.getElementById('sig-status'); if(st){st.textContent='✓ Podpis złożony';st.style.color='var(--ok)';} }
+  function up(){ dr=false; }
+  cv.addEventListener('mousedown',dn); cv.addEventListener('mousemove',mv); cv.addEventListener('mouseup',up);
+  cv.addEventListener('touchstart',dn,{passive:false}); cv.addEventListener('touchmove',mv,{passive:false}); cv.addEventListener('touchend',up);
+}
+
+function clearSignature(){
+  const cv=document.getElementById('sig-canvas'); if(!cv) return;
+  cv.getContext('2d').clearRect(0,0,cv.width,cv.height);
+  const st=document.getElementById('sig-status'); if(st){st.textContent='Podpisz palcem powyżej';st.style.color='var(--muted)';}
+}
+
+function getSignatureDataURL(){
+  const cv=document.getElementById('sig-canvas'); if(!cv) return null;
+  const d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;
+  return d.some((_,i)=>i%4===3&&d[i]>10) ? cv.toDataURL('image/png') : null;
 }
 
 // ══ SKANER QR KANDYDATA ══════════════════════════════════
 let qrScanInterval = null;
 let qrStream = null;
 
-function openScannerQR(){
+let qrScanMode = 'kandydat';
+function openScannerQR(mode){
+  qrScanMode = mode || 'kandydat';
+  const titleEl = document.getElementById('qr-scan-title');
+  if(titleEl) titleEl.textContent = (mode==='email') ? 'SKANUJ QR Z EMAILEM WORD' : 'SKANUJ KOD QR KANDYDATA';
   const modal = document.getElementById('qr-scanner-modal');
   modal.style.display = 'flex';
   const video = document.getElementById('qr-cam');
@@ -1765,7 +1812,18 @@ function parseQRData(text){
 
   if(!kandydat) kandydat = text.trim().slice(0, 60);
 
-  // Wpisz do formularza - użyj setAttribute dla pewności na iOS
+  // Tryb email
+  if(qrScanMode === 'email'){
+    const em = text.trim().match(/[a-zA-Z0-9._%+@-]+@[a-zA-Z0-9.-]+[.][a-zA-Z]{2,}/);
+    if(em){
+      document.getElementById('f-email').value = em[0];
+      toast('\u2713 Email WORD: ' + em[0], 3000);
+    } else {
+      toast('\u26a0 Nie znaleziono adresu email w kodzie QR');
+    }
+    return;
+  }
+  // Tryb kandydat
   const fk = document.getElementById('f-kandydat');
   const fp = document.getElementById('f-pkk');
   fk.value = kandydat || '';
@@ -1783,7 +1841,7 @@ function closeScannerQR(){
 }
 
 // Inicjalizuj datę po załadowaniu wszystkiego
-window.addEventListener("load", initDateTime);
+window.addEventListener("load", ()=>{initDateTime();initSignature();});
 initDateTime();
 </script>
 </body>
