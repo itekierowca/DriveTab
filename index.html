@@ -1659,16 +1659,20 @@ function generatePDF(){
   // Użyj Blob URL zamiast document.write — bezpieczne dla iOS Safari
   const blob = new Blob([html], {type: 'text/html'});
   const blobUrl = URL.createObjectURL(blob);
-  // Otwórz PDF w nowej karcie
-  window.open(blobUrl, '_blank');
 
+  // Pobierz jako plik z nazwą: NazwiskoImie_PKK_data.html
+  const safeName = (m.kandydat||'kandydat').replace(/[^a-zA-Z0-9À-ɏ]/g,'_');
+  const safePkk  = (m.pkk||'').replace(/\//g,'-');
+  const safeData = (m.data||'').replace(/\./g,'-');
+  const fileName = 'Arkusz_' + safeName + '_' + safePkk + '_' + safeData + '.html';
 
-  if(!win) {
-    // Fallback: pobierz jako plik
-    const a = document.createElement('a');
-    a.href = blobUrl; a.download = 'arkusz_' + m.kandydat.replace(/ /g,'_') + '.html';
-    a.click();
-  }
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(blobUrl), 5000);
 
   // Reset przycisku
   if(btnPdf){ btnPdf.textContent='✍ Podpisz i generuj PDF'; btnPdf.disabled=false; }
