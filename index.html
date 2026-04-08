@@ -574,7 +574,7 @@
       <div id="sig-status" style="flex:2;padding:8px;font-size:.8rem;color:var(--muted);text-align:center;align-self:center">Podpisz palcem powyżej</div>
     </div>
   </div>
-  <button class="btn-pdf" onclick="generatePDF()">&#x270D; Podpisz i wyślij PDF</button>
+  <button class="btn-pdf" onclick="generatePDF()">&#x270D; Podpisz i generuj PDF</button>
   <button class="btn-new" onclick="nowyEgzamin()">+ Nowy egzamin</button>
   <div style="height:40px"></div>
 </div>
@@ -1405,7 +1405,6 @@ function zakończEgzamin(reason){
 //  PDF GENERATOR — układ zgodny z Rozp. MI 2023 poz. 2659
 // ═══════════════════════════════════════════════════════════
 function generatePDF(){
-  const emailWORD='arkusze_egzaminacyjne@prawko.pl';
   const sigDataURL=getSignatureDataURL();
   if(!sigDataURL&&!confirm('Brak podpisu egzaminatora. Wygenerować PDF bez podpisu?')) return;
 
@@ -1660,24 +1659,6 @@ function generatePDF(){
   // Otwórz PDF w nowej karcie
   window.open(blobUrl, '_blank');
 
-  // Po 15 sekundach otwórz klienta email
-  if(emailWORD){
-    const sub=encodeURIComponent('Arkusz egzaminu '+(state.meta.kandydat||'')+' '+(state.meta.data||'')+' — '+(state.verdict||''));
-    const bod=encodeURIComponent('Kandydat: '+(state.meta.kandydat||'')+'\nPKK: '+(state.meta.pkk||'')+'\nData: '+(state.meta.data||'')+' '+(state.meta.godzina||'')+'\nWynik: '+(state.verdict||'')+'\nEgzaminator: '+(state.meta.egzaminator||'')+'\n\nWygenerowano przez DriveTab v1.0');
-
-    // Odliczanie — toast co sekundę
-    let remaining = 15;
-    toast('✉ Email otworzy się za '+remaining+'s…', 1200);
-    const ticker = setInterval(()=>{
-      remaining--;
-      if(remaining > 0){
-        toast('✉ Email otworzy się za '+remaining+'s…', 1200);
-      } else {
-        clearInterval(ticker);
-        window.location.href='mailto:'+emailWORD+'?subject='+sub+'&body='+bod;
-      }
-    },1000);
-  }
 
   if(!win) {
     // Fallback: pobierz jako plik
@@ -1687,7 +1668,7 @@ function generatePDF(){
   }
 
   // Reset przycisku
-  if(btnPdf){ btnPdf.textContent='✍ Podpisz i wyślij PDF'; btnPdf.disabled=false; }
+  if(btnPdf){ btnPdf.textContent='✍ Podpisz i generuj PDF'; btnPdf.disabled=false; }
   }, 60); // koniec setTimeout
 }
 function nowyEgzamin(){
