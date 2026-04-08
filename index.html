@@ -1649,10 +1649,7 @@ function generatePDF(){
   // Użyj Blob URL zamiast document.write — bezpieczne dla iOS Safari
   const blob = new Blob([html], {type: 'text/html'});
   const blobUrl = URL.createObjectURL(blob);
-  // Otwórz PDF w nowej karcie (iOS: bez auto-print, użytkownik drukuje sam)
-  window.open(blobUrl, '_blank');
-
-  // Otwórz mailto bezpośrednio — bez confirm (confirm blokuje mailto na iOS)
+  // Otwórz mailto bezpośrednio
   if(emailWORD){
     const sub=encodeURIComponent('Arkusz egzaminu '+(state.meta.kandydat||'')+' '+(state.meta.data||'')+' — '+(state.verdict||''));
     const bod=encodeURIComponent('Kandydat: '+(state.meta.kandydat||'')+'\nPKK: '+(state.meta.pkk||'')+'\nData: '+(state.meta.data||'')+' '+(state.meta.godzina||'')+'\nWynik: '+(state.verdict||'')+'\nEgzaminator: '+(state.meta.egzaminator||'')+'\n\nWygenerowano przez DriveTab v1.0');
