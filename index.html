@@ -1431,19 +1431,10 @@ function generatePDF(){
   function ocena(id){
     const s = state.plac[id] || {count:0,done:false};
     const n = s.count;
-    // 1□ — czerwony gdy błąd, szary gdy brak
-    const n1 = n>=1
-      ? '1<span style="color:#c0392b;font-weight:bold">&#x2611;</span>'
-      : '1&#x25A1;';
-    // 2□ — czerwony gdy 2. błąd
-    const n2 = n>=2
-      ? '2<span style="color:#c0392b;font-weight:bold">&#x2611;</span>'
-      : '2&#x25A1;';
-    // P□ — zielony gdy brak błędów i done, lub gdy 1 błąd ale zaliczone (nie negatywny)
+    const n1 = n>=1 ? '1<b class="chk-neg">&#x2611;</b>' : '1&#x25A1;';
+    const n2 = n>=2 ? '2<b class="chk-neg">&#x2611;</b>' : '2&#x25A1;';
     const zaliczone = (n===0 && s.done) || (n===1);
-    const poz = zaliczone
-      ? '<span style="color:#1a6b3a;font-weight:bold">&#x2611;</span>'
-      : '&#x25A1;';
+    const poz = zaliczone ? '<b class="chk-poz">&#x2611;</b>' : '&#x25A1;';
     return '<span class="sym">'+n1+'</span><span class="sym">'+n2+'</span><span class="sym poz">'+poz+'</span>';
   }
 
@@ -1500,17 +1491,10 @@ function generatePDF(){
   function ruchOcena(pdfId){
     const s = state.ruch[pdfId] || {count:0, done:false};
     const n = s.count;
-    const n1 = n>=1
-      ? '1<span style="color:#c0392b;font-weight:bold">&#x2611;</span>'
-      : '1&#x25A1;';
-    const n2 = n>=2
-      ? '2<span style="color:#c0392b;font-weight:bold">&#x2611;</span>'
-      : '2&#x25A1;';
-    // zielony gdy brak błędów i done, LUB gdy 1 błąd (ostrzeżenie ale zaliczone)
+    const n1 = n>=1 ? '1<b class="chk-neg">&#x2611;</b>' : '1&#x25A1;';
+    const n2 = n>=2 ? '2<b class="chk-neg">&#x2611;</b>' : '2&#x25A1;';
     const zaliczone = (n===0 && s.done) || (n===1);
-    const poz = zaliczone
-      ? '<span style="color:#1a6b3a;font-weight:bold">&#x2611;</span>'
-      : '&#x25A1;';
+    const poz = zaliczone ? '<b class="chk-poz">&#x2611;</b>' : '&#x25A1;';
     return '<span class="sym">'+n1+'</span><span class="sym">'+n2+'</span><span class="sym poz">'+poz+'</span>';
   }
 
@@ -1576,6 +1560,13 @@ function generatePDF(){
     border-top: 1px solid #888; padding-top: 2px; margin-top: 20px; width: 180px; }
   .footer { font-size: 5.5pt; color: #888; border-top: 1px solid #ddd;
     padding-top: 3px; margin-top: 6px; }
+  /* Kolorowe ptaszki — !important dla iOS Safari print */
+  .chk-neg { color: #c0392b !important; font-weight: bold !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .chk-poz { color: #1a6b3a !important; font-weight: bold !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  @media print {
+    .chk-neg { color: #c0392b !important; }
+    .chk-poz { color: #1a6b3a !important; }
+  }
   `;
 
   // Buduj HTML przez string concatenation — bez żadnych strukturalnych tagów w template literal
@@ -1658,20 +1649,16 @@ function generatePDF(){
   // Użyj Blob URL zamiast document.write — bezpieczne dla iOS Safari
   const blob = new Blob([html], {type: 'text/html'});
   const blobUrl = URL.createObjectURL(blob);
-  const win = window.open(blobUrl, '_blank');
-  if(win) {
-    win.addEventListener('load', () => { setTimeout(()=>win.print(), 400); });
-  }
+  // Otwórz PDF w nowej karcie (iOS: bez auto-print, użytkownik drukuje sam)
+  window.open(blobUrl, '_blank');
 
-  // Wyślij email do WORD
+  // Otwórz mailto bezpośrednio — bez confirm (confirm blokuje mailto na iOS)
   if(emailWORD){
     const sub=encodeURIComponent('Arkusz egzaminu '+(state.meta.kandydat||'')+' '+(state.meta.data||'')+' — '+(state.verdict||''));
-    const bod=encodeURIComponent('Kandydat: '+(state.meta.kandydat||'')+'\nPKK: '+(state.meta.pkk||'')+'\nData: '+(state.meta.data||'')+' '+(state.meta.godzina||'')+'\nWynik: '+(state.verdict||'')+'\nEgzaminator: '+(state.meta.egzaminator||'')+'\n\nArkusz PDF jest otwarty w nowej karcie — zapisz go i dołącz do wiadomości.\nDriveTab v1.0');
+    const bod=encodeURIComponent('Kandydat: '+(state.meta.kandydat||'')+'\nPKK: '+(state.meta.pkk||'')+'\nData: '+(state.meta.data||'')+' '+(state.meta.godzina||'')+'\nWynik: '+(state.verdict||'')+'\nEgzaminator: '+(state.meta.egzaminator||'')+'\n\nWygenerowano przez DriveTab v1.0');
     setTimeout(()=>{
-      if(confirm('Otworzyć klienta email?\nAdresat: '+emailWORD)){
-        window.location.href='mailto:'+emailWORD+'?subject='+sub+'&body='+bod;
-      }
-    },800);
+      window.location.href='mailto:'+emailWORD+'?subject='+sub+'&body='+bod;
+    },600);
   }
 
   if(!win) {
