@@ -784,6 +784,7 @@ function startEgzamin(){
   state.meta = {
     kandydat: k,
     pkk: pkk || '—',
+    pesel: (document.getElementById('f-pesel')?.value||'').trim(),
     data: document.getElementById('f-data').value,
     godzina: document.getElementById('f-godzina').value,
     egzaminator: document.getElementById('f-egzaminator').value.trim() || '—',
@@ -1668,7 +1669,8 @@ function generatePDF(){
       const safeName = (m.kandydat||'kandydat').replace(/\s+/g,'_');
       const safeData = (m.data||'').replace(/\./g,'-');
       const safePkk  = (m.pkk||'').replace(/\//g,'-');
-      win.document.title = 'Arkusz_' + safeName + '_' + safePkk + '_' + safeData;
+      const safePesel = (m.pesel||'');
+      win.document.title = safeName + '_' + safePkk + '_' + safePesel + '_' + safeData;
       setTimeout(()=>win.print(), 300);
     };
   }
