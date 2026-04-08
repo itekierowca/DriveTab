@@ -143,6 +143,7 @@
 
   /* Przygotowanie */
   .prep-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .prep-group-hdr { font-size:.7rem; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); padding:4px 2px 0; margin-top:4px; }
   .prep-item {
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
     padding: 13px 12px; min-height: 56px;
@@ -197,6 +198,7 @@
   .is-tablet .err-grid { grid-template-columns: 1fr 1fr; }
   .is-tablet #plac-tasks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .is-tablet .prep-grid { grid-template-columns: 1fr 1fr; }
+  .is-tablet .prep-group-hdr { grid-column: 1 / -1; }
   .is-tablet .prep-grid .err-item { font-size: .82rem; }
   .is-tablet .err-item { min-height: 52px; }
   .is-tablet .inc-btn { width: 40px; height: 40px; }
@@ -593,16 +595,34 @@ const state = {
 
 // ─── DANE EGZAMINU ────────────────────────────────────────
 
-const PREP_ITEMS = [
-  { id:'olej', label:'Sprawdzenie poziomu oleju' },
-  { id:'chlodnica', label:'Płyn chłodniczy' },
-  { id:'hamulcowy', label:'Płyn hamulcowy' },
-  { id:'spryskiwacz', label:'Płyn do spryskiwaczy' },
-  { id:'swiatla', label:'Sprawdzenie świateł' },
-  { id:'sygnaldz', label:'Sygnał dźwiękowy' },
-  { id:'pasy', label:'Pasy bezpieczeństwa' },
-  { id:'lusterka', label:'Lusterka / fotel' },
+const // Tabela nr 3 Rozp. MI 2023 poz.2659 — losowanie 1 z 5 + 1 z 8
+PREP_GRUPA1 = [
+  { id:'olej',       label:'Sprawdzenie poziomu oleju' },
+  { id:'chlodnica',  label:'Płyn chłodniczy' },
+  { id:'hamulcowy',  label:'Płyn hamulcowy' },
+  { id:'spryskiwacz',label:'Płyn do spryskiwaczy' },
+  { id:'sygnaldz',   label:'Sygnał dźwiękowy' },
 ];
+const PREP_GRUPA2 = [
+  { id:'sw_pozycyjne',  label:'Światła pozycyjne' },
+  { id:'sw_mijania',    label:'Światła mijania' },
+  { id:'sw_drogowe',    label:'Światła drogowe' },
+  { id:'sw_kierunk',    label:'Kierunkowskazy' },
+  { id:'sw_stop',       label:'Światła STOP' },
+  { id:'sw_cofania',    label:'Światła cofania' },
+  { id:'sw_awaryjne',   label:'Światła awaryjne' },
+  { id:'sw_przeciwmgl', label:'Światła przeciwmgłowe tylne' },
+];
+
+// Wylosuj 1 z grupy 1 + 1 z grupy 2 — wywoływane przy starcie egzaminu
+function losujPrepItems(){
+  const g1 = PREP_GRUPA1[Math.floor(Math.random() * PREP_GRUPA1.length)];
+  const g2 = PREP_GRUPA2[Math.floor(Math.random() * PREP_GRUPA2.length)];
+  return [g1, g2];
+}
+
+// Aktywne elementy w bieżącym egzaminie (uzupełniane przy starcie)
+let PREP_ITEMS = [];
 
 const PLAC_TASKS = [
   { id:'T1', name:'Przygotowanie do jazdy', abbr:'PRZYGOT.' },
@@ -800,6 +820,7 @@ function startEgzamin(){
   // reset state
   state.hp = { clips: drawHPClips(), current:0, done:false };
   state.plac = {}; state.ruch = {}; state.verdict = null; state.stopReason = null; state.stopPowody = []; state.placNegatywny = null;
+  PREP_ITEMS = losujPrepItems();
   PREP_ITEMS.forEach(p=>{ state.plac['prep_'+p.id] = {count:0, done:false}; });
   PLAC_TASKS.forEach(t=>{ state.plac[t.id] = {count:0, done:false}; });
   RUCH_ERRORS.forEach(e=>{ state.ruch[e.id] = {count:0, done:false}; });
@@ -1075,18 +1096,24 @@ function initManewry(){
 function renderPrepGrid(){
   const g = document.getElementById('prep-grid');
   g.innerHTML = '';
-  PREP_ITEMS.forEach(p=>{
+  // Losowane 2 elementy — wyświetl każdy z informacją o grupie
+  PREP_ITEMS.forEach((p, idx) => {
+    // Nagłówek grupy
+    const hdr = document.createElement('div');
+    hdr.className = 'prep-group-hdr';
+    hdr.textContent = idx === 0
+      ? 'Płyny / sygnał (losowany 1 z 5)'
+      : 'Oświetlenie (losowany 1 z 8)';
+    g.appendChild(hdr);
+
     const div = document.createElement('div');
     div.className = 'err-item'; div.id = 'prep_'+p.id;
-    div.innerHTML = `
-      <div class="err-body" onclick="tapPrep('${p.id}')">
-        <div class="err-label">${p.label}</div>
-      </div>
-      <div class="err-count" id="prc_${p.id}"></div>
-      <div class="err-inc">
-        <button class="inc-btn minus" onclick="event.stopPropagation();incPrep('${p.id}',-1)">−</button>
-        <button class="inc-btn plus"  onclick="event.stopPropagation();incPrep('${p.id}',+1)">+</button>
-      </div>`;
+    div.innerHTML = '<div class="err-body" onclick="tapPrep(\''+p.id+'\')"><div class="err-label">'+p.label+'</div></div>'
+      + '<div class="err-count" id="prc_'+p.id+'"></div>'
+      + '<div class="err-inc">'
+      + '<button class="inc-btn minus" onclick="event.stopPropagation();incPrep(\''+p.id+'\',-1)">−</button>'
+      + '<button class="inc-btn plus"  onclick="event.stopPropagation();incPrep(\''+p.id+'\',+1)">+</button>'
+      + '</div>';
     g.appendChild(div);
   });
 }
