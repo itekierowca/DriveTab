@@ -1677,6 +1677,10 @@ function generatePDF(){
     a.href = blobUrl; a.download = 'arkusz_' + m.kandydat.replace(/ /g,'_') + '.html';
     a.click();
   }
+
+  // Reset przycisku
+  const btnPdf = document.querySelector('.btn-pdf');
+  if(btnPdf){ btnPdf.textContent='✍ Podpisz i wyślij PDF'; btnPdf.disabled=false; }
 }
 function nowyEgzamin(){
   showScreen('intro');
