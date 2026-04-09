@@ -508,7 +508,7 @@
 
   <!-- ── PRZYGOTOWANIE POJAZDU ── -->
   <div class="section" id="sec-przygotowanie">
-    <div class="section-title">Przygotowanie pojazdu do jazdy</div>
+    <div class="section-title">Zadanie 1 — Przygotowanie pojazdu do jazdy</div>
     <div class="prep-grid" id="prep-grid">
       <!-- filled by JS -->
     </div>
@@ -621,7 +621,16 @@ function losujPrepItems(){
   return [g1, g2];
 }
 
-// Aktywne elementy w bieżącym egzaminie (uzupełniane przy starcie)
+// Zadania stałe — zawsze sprawdzane
+const PREP_STALE = [
+  { id:'fotel',    label:'Fotel' },
+  { id:'pasy',     label:'Pasy bezpieczeństwa' },
+  { id:'zagłowek', label:'Zagłówek' },
+  { id:'lusterka', label:'Lusterka' },
+  { id:'drzwi',    label:'Drzwi' },
+];
+
+// Aktywne elementy losowane w bieżącym egzaminie (uzupełniane przy starcie)
 let PREP_ITEMS = [];
 
 const PLAC_TASKS = [
@@ -824,6 +833,7 @@ function startEgzamin(){
   state.plac = {}; state.ruch = {}; state.verdict = null; state.stopReason = null; state.stopPowody = []; state.placNegatywny = null;
   PREP_ITEMS = losujPrepItems();
   PREP_ITEMS.forEach(p=>{ state.plac['prep_'+p.id] = {count:0, done:false}; });
+  PREP_STALE.forEach(p=>{ state.plac['prep_'+p.id] = {count:0, done:false}; });
   PLAC_TASKS.forEach(t=>{ state.plac[t.id] = {count:0, done:false}; });
   RUCH_ERRORS.forEach(e=>{ state.ruch[e.id] = {count:0, done:false}; });
 
@@ -1098,26 +1108,33 @@ function initManewry(){
 function renderPrepGrid(){
   const g = document.getElementById('prep-grid');
   g.innerHTML = '';
-  // Losowane 2 elementy — wyświetl każdy z informacją o grupie
-  PREP_ITEMS.forEach((p, idx) => {
-    // Nagłówek grupy
-    const hdr = document.createElement('div');
-    hdr.className = 'prep-group-hdr';
-    hdr.textContent = idx === 0
-      ? 'Płyny / sygnał (losowany 1 z 5)'
-      : 'Oświetlenie (losowany 1 z 8)';
-    g.appendChild(hdr);
 
+  function addItem(p){
     const div = document.createElement('div');
     div.className = 'err-item'; div.id = 'prep_'+p.id;
-    div.innerHTML = '<div class="err-body" onclick="tapPrep(\''+p.id+'\')"><div class="err-label">'+p.label+'</div></div>'
+    div.innerHTML = '<div class="err-body" onclick="tapPrep(\''+p.id+'\')" ><div class="err-label">'+p.label+'</div></div>'
       + '<div class="err-count" id="prc_'+p.id+'"></div>'
       + '<div class="err-inc">'
       + '<button class="inc-btn minus" onclick="event.stopPropagation();incPrep(\''+p.id+'\',-1)">−</button>'
       + '<button class="inc-btn plus"  onclick="event.stopPropagation();incPrep(\''+p.id+'\',+1)">+</button>'
       + '</div>';
     g.appendChild(div);
-  });
+  }
+
+  function addHdr(text){
+    const hdr = document.createElement('div');
+    hdr.className = 'prep-group-hdr';
+    hdr.textContent = text;
+    g.appendChild(hdr);
+  }
+
+  // Losowane (1 z 5 + 1 z 8)
+  addHdr('Losowane');
+  PREP_ITEMS.forEach(p => addItem(p));
+
+  // Stałe
+  addHdr('Zadania stałe');
+  PREP_STALE.forEach(p => addItem(p));
 }
 
 function tapPrep(id){
