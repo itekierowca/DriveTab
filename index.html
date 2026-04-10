@@ -1195,11 +1195,28 @@ function incWzn(id, delta){
   }, 0);
   if(sumaBlędów >= 2){
     toast('✗ NEGATYWNY — dwukrotnie nieprawidłowo wykonane zadanie', 4000);
-    // Zaznacz wszystkie elementy zadania na czerwono
     WZNIESIENIE_ITEMS.forEach(p=>{
       const el = document.getElementById('wzn_'+p.id);
       if(el){ el.style.borderColor='var(--danger)'; el.style.background='rgba(192,57,43,.08)'; }
     });
+    const btn = document.getElementById('btn-next-phase');
+    if(btn && currentPhase === 'plac'){
+      btn.textContent = '✗ Negatywny — zakończ';
+      btn.style.background = 'var(--danger)';
+      btn.onclick = () => zakończEgzamin('plac_negatywny');
+    }
+  } else {
+    // Cofnięcie — przywróć obramowania i sprawdź przycisk
+    WZNIESIENIE_ITEMS.forEach(p=>{ refreshWznItem(p.id); });
+    const anyFail = PLAC_TASKS.some(t => state.plac[t.id]?.count >= 2);
+    if(!anyFail){
+      const btn = document.getElementById('btn-next-phase');
+      if(btn && currentPhase === 'plac'){
+        btn.textContent = 'Ruch drogowy →';
+        btn.style.background = '';
+        btn.onclick = nextPhase;
+      }
+    }
   }
 }
 
@@ -1379,13 +1396,25 @@ function incPlac(id, delta){
   if(state.plac[id].count >= 2){
     const nazwa = PLAC_TASKS.find(t=>t.id===id)?.name || id;
     toast('✗ NEGATYWNY — ' + nazwa + ': 2× nieprawidłowe wykonanie', 4000);
-    state.placNegatywny = id; // zapamiętaj które zadanie zdecydowało
-    // Zablokuj przejście do ruchu i zmień kolor przycisku
+    state.placNegatywny = id;
     const btn = document.getElementById('btn-next-phase');
     if(btn){
       btn.textContent = '✗ Negatywny — zakończ';
       btn.style.background = 'var(--danger)';
       btn.onclick = () => zakończEgzamin('plac_negatywny');
+    }
+  } else {
+    // Cofnięcie błędu — przywróć przycisk jeśli żadne zadanie nie ma już >= 2
+    const anyFail = PLAC_TASKS.some(t => state.plac[t.id]?.count >= 2);
+    const wznFail = WZNIESIENIE_ITEMS.reduce((s,p)=>s+(state.wzn[p.id]?.count||0),0) >= 2;
+    if(!anyFail && !wznFail){
+      state.placNegatywny = null;
+      const btn = document.getElementById('btn-next-phase');
+      if(btn && currentPhase === 'plac'){
+        btn.textContent = 'Ruch drogowy →';
+        btn.style.background = '';
+        btn.onclick = nextPhase;
+      }
     }
   }
 }
