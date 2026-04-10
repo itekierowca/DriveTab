@@ -641,7 +641,7 @@ const PRE_ITEMS = [
   { id:'kody',       label:'Kody ograniczeń sprawdzone' },
 ];
 
-// Zadania stałe — zawsze sprawdzane
+// Elementy stałe — zawsze sprawdzane
 const PREP_STALE = [
   { id:'fotel',    label:'Fotel' },
   { id:'zagłowek', label:'Zagłówek' },
@@ -1218,11 +1218,11 @@ function renderPrepGrid(){
   }
 
   // Losowane (1 z 5 + 1 z 8)
-  addHdr('Losowane');
+  addHdr('Elementy losowane');
   PREP_ITEMS.forEach(p => addItem(p));
 
   // Stałe
-  addHdr('Zadania stałe');
+  addHdr('Elementy stałe');
   PREP_STALE.forEach(p => addItem(p));
 }
 
