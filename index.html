@@ -663,8 +663,8 @@ let PREP_ITEMS = [];
 
 // Zadanie 3 — Wzniesienie (tylko checkbox)
 const WZNIESIENIE_ITEMS = [
-  { id:'wzn_silnik',  label:'Silnik nie zgasł' },
-  { id:'wzn_cofanie', label:'Pojazd nie cofnął się więcej niż 20 cm' },
+  { id:'wzn_silnik',  label:'Silnik zgasł' },
+  { id:'wzn_cofanie', label:'Pojazd cofnął się więcej niż 20 cm' },
 ];
 
 const PLAC_TASKS = [
@@ -1188,9 +1188,13 @@ function incWzn(id, delta){
   s.count = Math.max(0, s.count + delta);
   if(s.count > 0) s.done = false;
   refreshWznItem(id);
-  if(s.count >= 2){
-    const nazwa = WZNIESIENIE_ITEMS.find(p=>p.id===id)?.label || id;
-    toast('✗ NEGATYWNY — ' + nazwa + ': 2× nieprawidłowe wykonanie', 4000);
+  // Negatywny gdy suma błędów z obu elementów >= 2
+  const sumaBlędów = WZNIESIENIE_ITEMS.reduce((sum,p)=>{
+    const st = state.wzn[p.id];
+    return sum + (st && typeof st==='object' ? st.count : 0);
+  }, 0);
+  if(sumaBlędów >= 2){
+    toast('✗ NEGATYWNY — Zadanie 3: łącznie 2 błędy na wzniesieniu', 4000);
   }
 }
 
