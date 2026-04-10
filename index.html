@@ -506,6 +506,18 @@
     <div class="hdr-sub" id="man-subtitle">Przygotowanie pojazdu</div>
   </div>
 
+  <!-- ── CZYNNOŚCI WSTĘPNE ── -->
+  <div class="section" id="sec-pre" style="border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="section-title" style="margin:0">Czynności wstępne</div>
+      <div id="pre-timer" style="font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--accent)">5:00</div>
+    </div>
+    <div id="pre-items-grid" style="display:flex;flex-direction:column;gap:8px">
+      <!-- filled by JS -->
+    </div>
+    <button onclick="startPreTimer()" id="btn-pre-timer" style="margin-top:12px;width:100%;padding:10px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--accent);font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer">▶ Start odliczania 5 min</button>
+  </div>
+
   <!-- ── PRZYGOTOWANIE POJAZDU ── -->
   <div class="section" id="sec-przygotowanie">
     <div class="section-title">Zadanie 1 — Przygotowanie pojazdu do jazdy</div>
@@ -620,6 +632,14 @@ function losujPrepItems(){
   const g2 = PREP_GRUPA2[Math.floor(Math.random() * PREP_GRUPA2.length)];
   return [g1, g2];
 }
+
+// Czynności wstępne — przed egzaminem (tylko checkbox, bez +/-)
+const PRE_ITEMS = [
+  { id:'tozsamosc',  label:'Tożsamość kandydata potwierdzona' },
+  { id:'zasady',     label:'Zasady egzaminu wyjaśnione i zrozumiane' },
+  { id:'przedstaw',  label:'Egzaminator przedstawiony' },
+  { id:'kody',       label:'Kody ograniczeń sprawdzone' },
+];
 
 // Zadania stałe — zawsze sprawdzane
 const PREP_STALE = [
@@ -832,6 +852,7 @@ function startEgzamin(){
   state.hp = { clips: drawHPClips(), current:0, done:false };
   state.plac = {}; state.ruch = {}; state.verdict = null; state.stopReason = null; state.stopPowody = []; state.placNegatywny = null;
   PREP_ITEMS = losujPrepItems();
+  PRE_ITEMS.forEach(p=>{  state.pre  = state.pre||{}; state.pre[p.id] = false; });
   PREP_ITEMS.forEach(p=>{ state.plac['prep_'+p.id] = {count:0, done:false}; });
   PREP_STALE.forEach(p=>{ state.plac['prep_'+p.id] = {count:0, done:false}; });
   PLAC_TASKS.forEach(t=>{ state.plac[t.id] = {count:0, done:false}; });
@@ -1095,6 +1116,15 @@ let currentPhase = 'plac';
 function initManewry(){
   document.getElementById('man-kandydat-name').textContent = state.meta.kandydat;
   currentPhase = 'plac';
+  // Reset timera wstępnego
+  preTimerSeconds = 300;
+  preTimerInterval && clearInterval(preTimerInterval);
+  preTimerInterval = null;
+  const timerEl = document.getElementById('pre-timer');
+  if(timerEl){ timerEl.textContent = '5:00'; timerEl.style.color = 'var(--accent)'; }
+  const btnPre = document.getElementById('btn-pre-timer');
+  if(btnPre) btnPre.textContent = '▶ Start odliczania 5 min';
+  renderPreItems();
   renderPrepGrid();
   renderPlacTasks();
   renderRuchErrors();
@@ -1103,6 +1133,65 @@ function initManewry(){
   document.getElementById('man-subtitle').textContent = 'Plac manewrowy';
   document.getElementById('btn-next-phase').textContent = 'Ruch drogowy →';
   updateStickyBar();
+}
+
+// ══ CZYNNOŚCI WSTĘPNE ═══════════════════════════════════════
+let preTimerInterval = null;
+let preTimerSeconds = 300; // 5 min
+
+function renderPreItems(){
+  const g = document.getElementById('pre-items-grid');
+  if(!g) return;
+  g.innerHTML = '';
+  PRE_ITEMS.forEach(p => {
+    const row = document.createElement('label');
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:10px;padding:12px;cursor:pointer;border:1px solid var(--border)';
+    const chk = document.createElement('input');
+    chk.type = 'checkbox';
+    chk.id = 'pre_'+p.id;
+    chk.style.cssText = 'width:22px;height:22px;flex-shrink:0;accent-color:var(--ok);cursor:pointer';
+    chk.checked = !!(state.pre && state.pre[p.id]);
+    chk.addEventListener('change', () => {
+      if(!state.pre) state.pre = {};
+      state.pre[p.id] = chk.checked;
+      row.style.background = chk.checked ? 'rgba(26,107,42,.12)' : 'var(--surface2)';
+      row.style.borderColor = chk.checked ? 'var(--ok)' : 'var(--border)';
+    });
+    if(chk.checked){ row.style.background='rgba(26,107,42,.12)'; row.style.borderColor='var(--ok)'; }
+    const lbl = document.createElement('span');
+    lbl.textContent = p.label;
+    lbl.style.cssText = 'font-size:.9rem;color:var(--text)';
+    row.appendChild(chk);
+    row.appendChild(lbl);
+    g.appendChild(row);
+  });
+}
+
+function startPreTimer(){
+  const btn = document.getElementById('btn-pre-timer');
+  if(preTimerInterval){ // zatrzymaj
+    clearInterval(preTimerInterval);
+    preTimerInterval = null;
+    btn.textContent = '▶ Wznów odliczanie';
+    return;
+  }
+  if(preTimerSeconds <= 0) { preTimerSeconds = 300; }
+  btn.textContent = '⏸ Pauza';
+  preTimerInterval = setInterval(()=>{
+    preTimerSeconds--;
+    const m = Math.floor(preTimerSeconds/60);
+    const s = preTimerSeconds % 60;
+    const el = document.getElementById('pre-timer');
+    if(el) el.textContent = m+':'+(s<10?'0':'')+s;
+    if(preTimerSeconds <= 60 && el) el.style.color = 'var(--warn)';
+    if(preTimerSeconds <= 0){
+      clearInterval(preTimerInterval);
+      preTimerInterval = null;
+      if(el){ el.textContent = '0:00'; el.style.color = 'var(--danger)'; }
+      btn.textContent = '⏱ Czas minął';
+      toast('⏱ Czas czynności wstępnych minął!', 4000);
+    }
+  }, 1000);
 }
 
 function renderPrepGrid(){
