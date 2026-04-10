@@ -532,6 +532,14 @@
     <div id="plac-tasks"><!-- JS --></div>
   </div>
 
+  <!-- ── ZADANIE 3: WZNIESIENIE ── -->
+  <div class="section" id="sec-wzniesienie">
+    <div class="section-title">Zadanie 3 — Ruszanie z miejsca do przodu na wzniesieniu</div>
+    <div id="wzn-items-grid" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
   <!-- ── RUCH DROGOWY ── -->
   <div class="section" id="sec-ruch" style="display:none">
     <div class="section-title">Ruch drogowy — obserwowane błędy</div>
@@ -652,6 +660,12 @@ const PREP_STALE = [
 
 // Aktywne elementy losowane w bieżącym egzaminie (uzupełniane przy starcie)
 let PREP_ITEMS = [];
+
+// Zadanie 3 — Wzniesienie (tylko checkbox)
+const WZNIESIENIE_ITEMS = [
+  { id:'wzn_silnik',  label:'Silnik nie zgasł' },
+  { id:'wzn_cofanie', label:'Pojazd nie cofnął się więcej niż 20 cm' },
+];
 
 const PLAC_TASKS = [
   { id:'T1', name:'Uruchomienie pojazdu', abbr:'URUCHOM.' },
@@ -855,6 +869,8 @@ function startEgzamin(){
   PRE_ITEMS.forEach(p=>{  state.pre  = state.pre||{}; state.pre[p.id] = false; });
   PREP_ITEMS.forEach(p=>{ state.plac['prep_'+p.id] = {count:0, done:false}; });
   PREP_STALE.forEach(p=>{ state.plac['prep_'+p.id] = {count:0, done:false}; });
+  state.wzn = {};
+  WZNIESIENIE_ITEMS.forEach(p=>{ state.wzn[p.id] = false; });
   PLAC_TASKS.forEach(t=>{ state.plac[t.id] = {count:0, done:false}; });
   RUCH_ERRORS.forEach(e=>{ state.ruch[e.id] = {count:0, done:false}; });
 
@@ -1126,6 +1142,7 @@ function initManewry(){
   if(btnPre) btnPre.textContent = '▶ Start odliczania 5 min';
   renderPreItems();
   renderPrepGrid();
+  renderWzniesieniItems();
   renderPlacTasks();
   renderRuchErrors();
   document.getElementById('sec-ruch').style.display = 'none';
@@ -1133,6 +1150,35 @@ function initManewry(){
   document.getElementById('man-subtitle').textContent = 'Plac manewrowy';
   document.getElementById('btn-next-phase').textContent = 'Ruch drogowy →';
   updateStickyBar();
+}
+
+// ══ ZADANIE 3: WZNIESIENIE ══════════════════════════════════
+function renderWzniesieniItems(){
+  const g = document.getElementById('wzn-items-grid');
+  if(!g) return;
+  g.innerHTML = '';
+  WZNIESIENIE_ITEMS.forEach(p => {
+    const row = document.createElement('label');
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:10px;padding:12px;cursor:pointer;border:1px solid var(--border)';
+    const chk = document.createElement('input');
+    chk.type = 'checkbox';
+    chk.id = 'wzn_'+p.id;
+    chk.style.cssText = 'width:22px;height:22px;flex-shrink:0;accent-color:var(--ok);cursor:pointer';
+    chk.checked = !!(state.wzn && state.wzn[p.id]);
+    chk.addEventListener('change', () => {
+      if(!state.wzn) state.wzn = {};
+      state.wzn[p.id] = chk.checked;
+      row.style.background = chk.checked ? 'rgba(26,107,42,.12)' : 'var(--surface2)';
+      row.style.borderColor = chk.checked ? 'var(--ok)' : 'var(--border)';
+    });
+    if(chk.checked){ row.style.background='rgba(26,107,42,.12)'; row.style.borderColor='var(--ok)'; }
+    const lbl = document.createElement('span');
+    lbl.textContent = p.label;
+    lbl.style.cssText = 'font-size:.9rem;color:var(--text)';
+    row.appendChild(chk);
+    row.appendChild(lbl);
+    g.appendChild(row);
+  });
 }
 
 // ══ CZYNNOŚCI WSTĘPNE ═══════════════════════════════════════
