@@ -1194,7 +1194,7 @@ function incWzn(id, delta){
     return sum + (st && typeof st==='object' ? st.count : 0);
   }, 0);
   if(sumaBlędów >= 2){
-    toast('✗ NEGATYWNY — Zadanie 3: łącznie 2 błędy na wzniesieniu', 4000);
+    toast('✗ NEGATYWNY — dwukrotnie nieprawidłowo wykonane zadanie', 4000);
     // Zaznacz wszystkie elementy zadania na czerwono
     WZNIESIENIE_ITEMS.forEach(p=>{
       const el = document.getElementById('wzn_'+p.id);
