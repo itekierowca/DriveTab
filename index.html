@@ -663,8 +663,8 @@ let PREP_ITEMS = [];
 
 // Zadanie 3 — Wzniesienie (tylko checkbox)
 const WZNIESIENIE_ITEMS = [
-  { id:'wzn_silnik',  label:'Silnik zgasł' },
-  { id:'wzn_cofanie', label:'Pojazd cofnął się więcej niż 20 cm' },
+  { id:'wzn_silnik',  label:'Silnik nie zgasł' },
+  { id:'wzn_cofanie', label:'Pojazd nie cofnął się więcej niż 20 cm' },
 ];
 
 const PLAC_TASKS = [
@@ -1195,6 +1195,11 @@ function incWzn(id, delta){
   }, 0);
   if(sumaBlędów >= 2){
     toast('✗ NEGATYWNY — Zadanie 3: łącznie 2 błędy na wzniesieniu', 4000);
+    // Zaznacz wszystkie elementy zadania na czerwono
+    WZNIESIENIE_ITEMS.forEach(p=>{
+      const el = document.getElementById('wzn_'+p.id);
+      if(el){ el.style.borderColor='var(--danger)'; el.style.background='rgba(192,57,43,.08)'; }
+    });
   }
 }
 
