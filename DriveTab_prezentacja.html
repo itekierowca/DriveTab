@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DriveTab — Prezentacja dla Dyrektorów WORD</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0A1628;
+  --navy2:#0F1F3D;
+  --teal:#00C9B1;
+  --teal2:#00A896;
+  --gold:#F5A623;
+  --red:#E8453C;
+  --white:#F0F4FF;
+  --muted:#7A8BAA;
+  --border:rgba(0,201,177,.15);
+  --glass:rgba(15,31,61,.7);
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+
+/* ── SLIDES ── */
+.deck{width:100%;height:100%;position:relative}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  padding:5vw 7vw;
+  opacity:0;pointer-events:none;
+  transition:opacity .5s ease;
+  overflow:hidden;
+}
+.slide.active{opacity:1;pointer-events:all}
+
+/* Background mesh */
+.slide::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 20% 30%, rgba(0,201,177,.07) 0%, transparent 60%),
+             radial-gradient(ellipse 60% 80% at 80% 70%, rgba(245,166,35,.05) 0%, transparent 60%);
+  pointer-events:none;
+}
+/* Grid lines */
+.slide::after{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,201,177,.04) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(0,201,177,.04) 1px, transparent 1px);
+  background-size:80px 80px;
+  pointer-events:none;
+}
+
+/* ── TYPOGRAPHY ── */
+.kicker{font-family:'DM Sans',sans-serif;font-size:clamp(.7rem,1.2vw,.9rem);font-weight:500;
+  letter-spacing:.25em;text-transform:uppercase;color:var(--teal);margin-bottom:1.2em}
+h1{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,5.5vw,5rem);font-weight:800;
+  line-height:1.05;letter-spacing:-.03em;color:var(--white)}
+h2{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,3.5vw,3rem);font-weight:700;
+  line-height:1.1;letter-spacing:-.02em;color:var(--white)}
+h3{font-family:'Syne',sans-serif;font-size:clamp(1.1rem,2vw,1.8rem);font-weight:600;color:var(--teal)}
+.lead{font-size:clamp(.95rem,1.8vw,1.25rem);font-weight:300;line-height:1.7;color:rgba(240,244,255,.75);max-width:65ch}
+.accent{color:var(--teal)}
+.gold{color:var(--gold)}
+.red{color:var(--red)}
+
+/* ── COMPONENTS ── */
+.tag{display:inline-flex;align-items:center;gap:.5em;
+  background:rgba(0,201,177,.12);border:1px solid rgba(0,201,177,.3);
+  color:var(--teal);font-size:.75rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  padding:.35em .9em;border-radius:2em}
+.pill-row{display:flex;flex-wrap:wrap;gap:.7em;margin-top:1.5em}
+
+.card{
+  background:rgba(15,31,61,.6);border:1px solid var(--border);
+  border-radius:1.2em;padding:2em;backdrop-filter:blur(12px);
+  transition:border-color .3s;
+}
+.card:hover{border-color:rgba(0,201,177,.4)}
+
+.stat-big{font-family:'Syne',sans-serif;font-size:clamp(2.5rem,6vw,5rem);
+  font-weight:800;letter-spacing:-.04em;color:var(--teal);line-height:1}
+.stat-label{font-size:.8rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-top:.4em}
+
+.divider{width:3em;height:3px;background:var(--teal);border-radius:2px;margin:1.5em 0}
+
+.qr-box{
+  background:white;border-radius:1.2em;padding:1.4em;
+  display:flex;flex-direction:column;align-items:center;gap:.8em;
+  box-shadow:0 0 0 1px rgba(0,201,177,.2), 0 20px 60px rgba(0,0,0,.4);
+}
+.qr-box img{width:180px;height:180px;border-radius:.4em}
+.qr-label{font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#0A1628}
+
+/* ── TWO-COL LAYOUTS ── */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:4vw;width:100%;align-items:center}
+.split-3{display:grid;grid-template-columns:repeat(3,1fr);gap:2vw;width:100%}
+.split-3-1{display:grid;grid-template-columns:3fr 2fr;gap:4vw;width:100%;align-items:center}
+
+/* ── ARGUMENT LIST ── */
+.arg-list{list-style:none;display:flex;flex-direction:column;gap:.9em;margin-top:1em}
+.arg-list li{display:flex;align-items:flex-start;gap:1em;font-size:clamp(.85rem,1.5vw,1.05rem);
+  line-height:1.6;color:rgba(240,244,255,.85)}
+.arg-list li::before{content:'→';color:var(--teal);font-weight:700;flex-shrink:0;margin-top:.1em}
+
+/* ── QUOTE ── */
+.quote-block{
+  border-left:3px solid var(--teal);padding-left:1.5em;
+  font-size:clamp(1rem,1.8vw,1.3rem);font-style:italic;font-weight:300;
+  line-height:1.65;color:rgba(240,244,255,.9);
+}
+.quote-attr{font-style:normal;font-size:.8rem;color:var(--muted);margin-top:.8em;letter-spacing:.05em}
+
+/* ── COMPARISON TABLE ── */
+.comp{display:grid;grid-template-columns:1fr auto 1fr;gap:0;width:100%;margin-top:1em}
+.comp-hdr{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;
+  padding:.7em 1.2em;text-align:center}
+.comp-hdr.old{color:var(--muted);background:rgba(255,255,255,.03);border-radius:.8em .8em 0 0}
+.comp-hdr.new{color:var(--teal);background:rgba(0,201,177,.08);border-radius:.8em .8em 0 0}
+.comp-vs{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;padding:0 1em}
+.comp-row{display:contents}
+.comp-cell{padding:.65em 1.2em;font-size:clamp(.75rem,1.3vw,.9rem);line-height:1.5}
+.comp-cell.old{color:rgba(240,244,255,.5);border-right:1px solid rgba(255,255,255,.05)}
+.comp-cell.new{color:rgba(240,244,255,.9);background:rgba(0,201,177,.04)}
+.comp-cell:nth-child(3n+1){border-bottom:1px solid rgba(255,255,255,.04)}
+.comp-cell:nth-child(3n+3){border-bottom:1px solid rgba(0,201,177,.06)}
+.comp-spacer{border-bottom:1px solid transparent}
+
+/* ── TIMELINE ── */
+.timeline{display:flex;flex-direction:column;gap:0;position:relative;padding-left:2.5em}
+.timeline::before{content:'';position:absolute;left:.85em;top:.5em;bottom:.5em;width:2px;
+  background:linear-gradient(to bottom, var(--teal), rgba(0,201,177,.1))}
+.tl-item{position:relative;padding:.6em 0 .6em 1.5em;font-size:clamp(.8rem,1.4vw,.95rem);
+  line-height:1.5;color:rgba(240,244,255,.8)}
+.tl-dot{position:absolute;left:-1.65em;top:.8em;width:10px;height:10px;
+  background:var(--teal);border-radius:50%;box-shadow:0 0 0 3px rgba(0,201,177,.2)}
+.tl-year{font-family:'Syne',sans-serif;font-weight:700;color:var(--teal);font-size:.85em;margin-right:.5em}
+
+/* ── NAVIGATION ── */
+.nav{
+  position:fixed;bottom:2.5em;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:1em;
+  background:rgba(10,22,40,.8);border:1px solid var(--border);
+  padding:.6em 1.2em;border-radius:3em;backdrop-filter:blur(20px);
+  z-index:100;
+}
+.nav-btn{
+  width:2.4em;height:2.4em;border-radius:50%;border:1px solid var(--border);
+  background:transparent;color:var(--teal);cursor:pointer;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;font-family:'DM Sans',sans-serif;
+}
+.nav-btn:hover{background:rgba(0,201,177,.15);border-color:var(--teal)}
+.nav-counter{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
+  color:var(--muted);min-width:3em;text-align:center}
+
+/* ── SLIDE-SPECIFIC ── */
+/* Slide 1 hero */
+#s1 .hero-badge{
+  position:absolute;top:2em;right:3em;
+  background:rgba(0,201,177,.1);border:1px solid rgba(0,201,177,.3);
+  border-radius:.6em;padding:.6em 1.2em;font-size:.75rem;font-weight:600;
+  color:var(--teal);letter-spacing:.08em;text-align:center;
+}
+#s1 h1 .line2{color:var(--teal)}
+.hero-sub{font-size:clamp(.8rem,1.4vw,1rem);color:var(--muted);margin-top:.4em;letter-spacing:.05em}
+
+/* Slide 2 QR */
+#s2 .qr-hero{
+  display:flex;flex-direction:column;align-items:center;gap:2em;
+  position:relative;z-index:1;
+}
+#s2 .qr-glow{
+  position:absolute;width:320px;height:320px;
+  background:radial-gradient(circle, rgba(0,201,177,.15) 0%, transparent 70%);
+  border-radius:50%;pointer-events:none;
+}
+
+/* Slide 3 demo QR */
+#s3 .demo-layout{display:grid;grid-template-columns:1fr 1fr;gap:4vw;width:100%;align-items:start}
+
+/* ── PROGRESS BAR ── */
+.progress{
+  position:fixed;top:0;left:0;height:3px;
+  background:linear-gradient(90deg, var(--teal), var(--gold));
+  transition:width .4s ease;z-index:200;
+}
+
+/* ── ENTER ANIMATIONS ── */
+.slide.active .kicker{animation:fadeUp .5s .1s both}
+.slide.active h1,.slide.active h2{animation:fadeUp .5s .2s both}
+.slide.active .lead{animation:fadeUp .5s .3s both}
+.slide.active .divider{animation:fadeUp .4s .35s both}
+.slide.active .card{animation:fadeUp .5s .4s both}
+.slide.active .qr-box{animation:fadeUp .6s .3s both}
+.slide.active .arg-list{animation:fadeUp .5s .4s both}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+<!-- ══════════════════════════════════════════════════════
+     SLAJD 1: TYTUŁ
+══════════════════════════════════════════════════════ -->
+<div class="slide active" id="s1">
+  <div class="hero-badge">Pilotaż 2026<br>Kat. B</div>
+  <div style="position:relative;z-index:1;max-width:900px;width:100%">
+    <div class="kicker">Stowarzyszenie Kierowca.pl — prezentacja dla Dyrektorów WORD</div>
+    <h1>Drive<span class="accent">Tab</span><br><span style="font-size:.6em;font-weight:600;color:rgba(240,244,255,.6)">Elektroniczny arkusz<br>egzaminu praktycznego</span></h1>
+    <div class="divider"></div>
+    <p class="lead">Narzędzie zmieniające rolę egzaminatora — z osoby wyszukującej błędy w <strong style="color:var(--white)">profesjonalnego oceniającego kompetencje</strong>.</p>
+    <div class="pill-row" style="margin-top:2em">
+      <span class="tag">✓ Zgodne z Rozp. MI 2023 poz. 2659</span>
+      <span class="tag">✓ Gotowe na Dyrektywę UE 2025/2205</span>
+      <span class="tag">✓ Zero kosztów pilotażu</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLAJD 2: KOD QR DO APLIKACJI
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="qr-glow"></div>
+  <div class="qr-hero" style="position:relative;z-index:1">
+    <div class="kicker">Wypróbuj teraz — na swoim telefonie lub tablecie</div>
+    <h2 style="text-align:center">Zeskanuj i otwórz<br><span class="accent">DriveTab</span></h2>
+    <div class="qr-box">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://drivetab.netlify.app&color=0A1628&bgcolor=FFFFFF" alt="QR DriveTab">
+      <div class="qr-label" style="color:#0A1628">drivetab.netlify.app</div>
+    </div>
+    <p class="lead" style="text-align:center;font-size:clamp(.8rem,1.4vw,1rem)">Aplikacja webowa — działa na każdym urządzeniu.<br>Nie wymaga instalacji. Działa offline.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLAJD 3: KOD QR KANDYDATA (DEMO)
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="demo-layout" style="position:relative;z-index:1;width:100%">
+    <div>
+      <div class="kicker">Identyfikacja kandydata — start egzaminu</div>
+      <h2>Skanowanie<br>kodu <span class="accent">QR</span><br>kandydata</h2>
+      <div class="divider"></div>
+      <p class="lead" style="font-size:clamp(.8rem,1.5vw,1rem)">Egzaminator skanuje kod QR z listy egzaminowanych. Dane kandydata wypełniają się automatycznie — bez przepisywania.</p>
+      <div style="margin-top:1.5em;display:flex;flex-direction:column;gap:.7em">
+        <div class="card" style="padding:1em 1.4em">
+          <div style="font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.3em">Kandydat</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem">Jan Kowalski</div>
+        </div>
+        <div class="card" style="padding:1em 1.4em">
+          <div style="font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.3em">PESEL</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:.05em">96031512345</div>
+        </div>
+        <div class="card" style="padding:1em 1.4em">
+          <div style="font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.3em">Nr PKK</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:.03em">PL/14/2026/0087234</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:1.5em">
+      <div class="qr-box">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Kandydat%3A+Jan+Kowalski%0APESEL%3A+96031512345%0APKK%3A+PL%2F14%2F2026%2F0087234&color=0A1628&bgcolor=FFFFFF" alt="QR Kandydat">
+        <div class="qr-label" style="color:#0A1628;font-size:.65rem">Jan Kowalski · 96031512345</div>
+      </div>
+      <p style="font-size:.75rem;color:var(--muted);text-align:center;max-width:18em;line-height:1.6">Kod QR generowany przez WORD z listy egzaminowanych. Może być naklejony na kartce lub wyświetlony na ekranie.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLAJD 4: JAK DZIAŁA — FLOW
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div style="position:relative;z-index:1;width:100%">
+    <div class="kicker">Przebieg egzaminu z DriveTab</div>
+    <h2>Cały egzamin w <span class="accent">jednym narzędziu</span></h2>
+    <div class="divider"></div>
+    <div class="split-3" style="margin-top:1.5em;align-items:start">
+      <div class="card">
+        <div style="font-size:1.8rem;margin-bottom:.6em">📋</div>
+        <h3 style="font-size:clamp(.9rem,1.5vw,1.1rem);margin-bottom:.6em">Czynności wstępne</h3>
+        <p style="font-size:clamp(.75rem,1.2vw,.85rem);color:rgba(240,244,255,.6);line-height:1.6">Tożsamość, zasady, kody ograniczeń. Timer 5 min. Checkboxy — szybko i czytelnie.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.8rem;margin-bottom:.6em">🚗</div>
+        <h3 style="font-size:clamp(.9rem,1.5vw,1.1rem);margin-bottom:.6em">Plac + Ruch</h3>
+        <p style="font-size:clamp(.75rem,1.2vw,.85rem);color:rgba(240,244,255,.6);line-height:1.6">Tap = zaliczone. + = błąd. Automatyczny wynik negatywny przy 2 błędach. Nic nie można pominąć.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.8rem;margin-bottom:.6em">📄</div>
+        <h3 style="font-size:clamp(.9rem,1.5vw,1.1rem);margin-bottom:.6em">Arkusz PDF</h3>
+        <p style="font-size:clamp(.75rem,1.2vw,.85rem);color:rgba(240,244,255,.6);line-height:1.6">Podpis palcem. PDF z timestampem i QR kandydata. Gotowy w 10 sekund. Dowód w razie odwołania.</p>
+      </div>
+    </div>
+    <div style="margin-top:1.5em" class="card">
+      <div style="display:flex;align-items:center;gap:1em;flex-wrap:wrap">
+        <span class="tag" style="font-size:.7rem">Test HP — percepcja zagrożeń</span>
+        <span style="font-size:.85rem;color:rgba(240,244,255,.7)">5 klipów wideo · wynik diagnostyczny · zgodny z Dyrektywą UE 2025/2205</span>
+        <span class="tag" style="font-size:.7rem;margin-left:auto;color:var(--gold);border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.08)">obowiązek od 2029</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLAJD 5: ZMIANA PARADYGMATU
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div style="position:relative;z-index:1;width:100%;max-width:960px">
+    <div class="kicker">Dlaczego to ważne — psychologia oceny</div>
+    <h2>Zmiana <span class="accent">architektury</span> pracy</h2>
+    <div class="divider"></div>
+    <div class="split" style="margin-top:1.5em;align-items:start">
+      <div>
+        <div style="font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.8em">Papierowy arkusz</div>
+        <ul class="arg-list" style="gap:.6em">
+          <li style="color:rgba(240,244,255,.45)">Egzaminator <em>szuka błędów</em> — nastawienie negatywne</li>
+          <li style="color:rgba(240,244,255,.45)">Pamięć robocza przeciążona listą "nieocenionych" elementów</li>
+          <li style="color:rgba(240,244,255,.45)">Retroaktywne zaznaczanie po egzaminie — podatne na błędy</li>
+          <li style="color:rgba(240,244,255,.45)">Widzialne zapisywanie zwiększa stres kandydata</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin-bottom:.8em">DriveTab</div>
+        <ul class="arg-list">
+          <li>Domyślnie <strong style="color:var(--teal)">zaliczone</strong> — egzaminator obserwuje, tapuje tylko błąd</li>
+          <li>Stan arkusza zawsze widoczny — zero obciążenia pamięci</li>
+          <li>Wynik generowany automatycznie — zero retroaktywności</li>
+          <li>Dyskretne tapnięcie — kandydat nie wie co jest zaznaczane</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:2em" class="quote-block">
+      „Dobry egzaminator to nie ten, który <em>wie szybciej</em>, ani ten, który <em>pomaga bardziej</em>, lecz ten, który potrafi <strong style="color:var(--white);font-style:normal">nie wpływać</strong> — i dopiero na tej podstawie trafnie ocenić."
+      <div class="quote-attr">— Dariusz Pilch, ekspert ds. egzaminowania, 2025</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLAJD 6: ZAGRANICA
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div style="position:relative;z-index:1;width:100%">
+    <div class="kicker">Kontekst europejski</div>
+    <h2>Polska jest <span class="accent">gotowa prawnie</span><br>od 1 stycznia 2024</h2>
+    <div class="divider"></div>
+    <div class="split-3" style="margin-top:1.5em;align-items:stretch">
+      <div class="card" style="display:flex;flex-direction:column;gap:.6em">
+        <div style="font-size:1.4rem">🇬🇧</div>
+        <h3 style="font-size:clamp(.85rem,1.4vw,1rem)">Wielka Brytania</h3>
+        <p style="font-size:clamp(.75rem,1.1vw,.85rem);color:rgba(240,244,255,.6);line-height:1.6;flex:1">DVSA wdrożyło tablety dla <strong style="color:var(--white)">1900 egzaminatorów</strong> w 2019 r. 1,9 mln egzaminów rocznie. Papierowy DL25 zastąpiony w całości.</p>
+        <div class="tag" style="font-size:.65rem;align-self:flex-start">Od 2019</div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:.6em">
+        <div style="font-size:1.4rem">🇧🇪</div>
+        <h3 style="font-size:clamp(.85rem,1.4vw,1rem)">Belgia</h3>
+        <p style="font-size:clamp(.75rem,1.1vw,.85rem);color:rgba(240,244,255,.6);line-height:1.6;flex:1">GOCA Flandria — cyfrowy arkusz + <strong style="color:var(--white)">test HP</strong> jako narzędzie diagnostyczne. Wynik HP nie wpływa na egzamin — wzorzec dla DriveTab.</p>
+        <div class="tag" style="font-size:.65rem;align-self:flex-start">Od 2022</div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:.6em">
+        <div style="font-size:1.4rem">🇳🇱</div>
+        <h3 style="font-size:clamp(.85rem,1.4vw,1rem)">Holandia</h3>
+        <p style="font-size:clamp(.75rem,1.1vw,.85rem);color:rgba(240,244,255,.6);line-height:1.6;flex:1">CBR — wynik egzaminu <strong style="color:var(--white)">trafia automatycznie</strong> do rejestru Gemeente. Kandydat nie czeka na papierowy dokument.</p>
+        <div class="tag" style="font-size:.65rem;align-self:flex-start">Od 2015</div>
+      </div>
+    </div>
+    <div style="margin-top:1.5em;text-align:center;font-size:clamp(.8rem,1.4vw,1rem);color:var(--muted)">
+      Polska ma ustawowe upoważnienie do elektronicznego arkusza od <strong style="color:var(--white)">1 stycznia 2024 r.</strong> (§ 28 ust. 1 pkt 7 Rozp. MI 2023 poz. 2659).
+      Jesteśmy <strong style="color:var(--gold)">5 lat za UK</strong>.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLAJD 7: ARGUMENTY DLA DYREKTORA
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div style="position:relative;z-index:1;width:100%;max-width:960px">
+    <div class="kicker">Dla Dyrektora WORD</div>
+    <h2>Co WORD zyska<br><span class="accent">od pierwszego egzaminu</span></h2>
+    <div class="divider"></div>
+    <div class="split" style="margin-top:1.5em;align-items:start;gap:3vw">
+      <ul class="arg-list">
+        <li><strong style="color:var(--white)">Ochrona prawna</strong> — timestamp, QR kandydata i podpis cyfrowy. Niepodważalna dokumentacja w postępowaniach odwoławczych.</li>
+        <li><strong style="color:var(--white)">Dane BRD</strong> — profil błędów kandydatów z regionu. Argument do dialogu z OSK i Ministerstwem Infrastruktury.</li>
+        <li><strong style="color:var(--white)">Gotowość na 2029</strong> — moduł HP gotowy. WORD buduje kompetencje 3 lata przed obowiązkiem ustawowym.</li>
+      </ul>
+      <ul class="arg-list">
+        <li><strong style="color:var(--white)">Zero kosztów pilotażu</strong> — aplikacja webowa na istniejącym tablecie. Brak integracji z SIWORD na etapie 1.</li>
+        <li><strong style="color:var(--white)">Prestiż instytucji</strong> — egzaminator z tabletem to sygnał nowoczesności dla kandydatów i OSK.</li>
+        <li><strong style="color:var(--white)">Pełna legalność</strong> — Rozp. MI 2023 poz. 2659 § 28 ust. 1 pkt 7. Bez zmian prawa.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLAJD 8: ARGUMENTY DLA EGZAMINATORA
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s8">
+  <div style="position:relative;z-index:1;width:100%;max-width:960px">
+    <div class="kicker">Dla Egzaminatora</div>
+    <h2>Mniej biurokracji,<br><span class="accent">więcej profesjonalizmu</span></h2>
+    <div class="divider"></div>
+    <div class="split-3" style="margin-top:1.5em;align-items:stretch">
+      <div class="card" style="display:flex;flex-direction:column;gap:.5em">
+        <div class="stat-big">−50<span style="font-size:.4em">min</span></div>
+        <div class="stat-label">Oszczędność dziennie</div>
+        <p style="font-size:.8rem;color:rgba(240,244,255,.5);line-height:1.5;flex:1;margin-top:.5em">5–10 min mniej dokumentacji per egzamin × 5–7 egzaminów = <strong style="color:var(--white)">25–50 minut dziennie</strong> do odzyskania.</p>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:.5em">
+        <div class="stat-big" style="color:var(--gold)">0</div>
+        <div class="stat-label">Ryzyka odwoławczego</div>
+        <p style="font-size:.8rem;color:rgba(240,244,255,.5);line-height:1.5;flex:1;margin-top:.5em">Cyfrowy arkusz z podpisem i timestampem eliminuje spory o treść papierowego dokumentu.</p>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:.5em">
+        <div class="stat-big" style="color:var(--teal);font-size:clamp(1.5rem,3vw,2.5rem)">Diagnosta</div>
+        <div class="stat-label">Nowa rola zawodowa</div>
+        <p style="font-size:.8rem;color:rgba(240,244,255,.5);line-height:1.5;flex:1;margin-top:.5em">Zmiana z "strażnika bramy" w profesjonalnego oceniającego kompetencje. Wyższy prestiż zawodu.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLAJD 9: SCENARIUSZ PILOTAŻU
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s9">
+  <div style="position:relative;z-index:1;width:100%;max-width:880px">
+    <div class="kicker">Jak zacząć — propozycja pilotażu</div>
+    <h2>Gotowi w <span class="accent">jeden dzień</span></h2>
+    <div class="divider"></div>
+    <div class="split" style="margin-top:1.5em;align-items:start">
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><span class="tl-year">Tydzień 1</span>Wyznacz 2–3 egzaminatorów. Otwórz drivetab.netlify.app na tablecie. Szkolenie: 2 godziny.</div>
+        <div class="tl-item"><div class="tl-dot"></div><span class="tl-year">Tygodnie 2–5</span>Pilot równoległy — DriveTab + papier jednocześnie. Porównanie wyników, zbieranie feedbacku.</div>
+        <div class="tl-item"><div class="tl-dot"></div><span class="tl-year">Od tygodnia 6</span>Przejście na DriveTab. Papier jako backup. Pierwsze raporty danych.</div>
+        <div class="tl-item"><div class="tl-dot"></div><span class="tl-year">Miesiąc 3</span>Decyzja o rozszerzeniu. Opcjonalnie: raport dla sieci WORDów i MI.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1em">
+        <div class="card" style="padding:1.2em 1.5em">
+          <div style="font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.5em">Koszt pilotażu</div>
+          <div class="stat-big" style="font-size:2.5rem;color:var(--teal)">0 zł</div>
+          <p style="font-size:.8rem;color:rgba(240,244,255,.5);margin-top:.4em">Aplikacja webowa. Bez licencji, bez serwera, bez integracji.</p>
+        </div>
+        <div class="card" style="padding:1.2em 1.5em">
+          <div style="font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.5em">Wymagany sprzęt</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;color:var(--white)">Tablet lub iPad</div>
+          <p style="font-size:.8rem;color:rgba(240,244,255,.5);margin-top:.4em">Już dostępny w większości WORDów. Brak zakupów.</p>
+        </div>
+        <div class="card" style="padding:1.2em 1.5em;border-color:rgba(0,201,177,.3)">
+          <div style="font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.5em">Ryzyko operacyjne</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;color:var(--teal)">Minimalne</div>
+          <p style="font-size:.8rem;color:rgba(240,244,255,.5);margin-top:.4em">Papierowy arkusz zawsze dostępny jako backup.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLAJD 10: ZAMKNIĘCIE / CTA
+══════════════════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <div style="position:relative;z-index:1;text-align:center;max-width:800px">
+    <div class="kicker">Następny krok</div>
+    <h1 style="font-size:clamp(2rem,5vw,4rem)">Zróbmy <span class="accent">pilotaż</span><br>razem</h1>
+    <div class="divider" style="margin:1.5em auto"></div>
+    <p class="lead" style="text-align:center;margin:0 auto">Stowarzyszenie Kierowca.pl oferuje pełne wsparcie wdrożeniowe — szkolenie egzaminatorów, konfigurację listy zadań dla każdej kategorii i analizę danych.</p>
+    <div style="margin-top:2.5em;display:flex;justify-content:center;gap:2em;flex-wrap:wrap">
+      <div class="qr-box" style="padding:1em">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://drivetab.netlify.app&color=0A1628&bgcolor=FFFFFF" alt="QR">
+        <div class="qr-label" style="color:#0A1628;font-size:.65rem">drivetab.netlify.app</div>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:center;gap:.8em;text-align:left">
+        <div>
+          <div style="font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Kontakt</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:600;font-size:1rem;margin-top:.2em">rafal.matuszak@kierowca.pl</div>
+        </div>
+        <div>
+          <div style="font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Podstawa prawna</div>
+          <div style="font-size:.85rem;color:rgba(240,244,255,.7);margin-top:.2em;max-width:28ch;line-height:1.5">Rozp. MI z dn. 24.11.2023 r.<br>Dz.U. 2023 poz. 2659 § 28 ust. 1 pkt 7</div>
+        </div>
+        <div>
+          <div style="font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Dyrektywa UE</div>
+          <div style="font-size:.85rem;color:rgba(240,244,255,.7);margin-top:.2em">(UE) 2025/2205 — HP obowiązkowy od 26.11.2029</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<!-- ── NAVIGATION ── -->
+<nav class="nav">
+  <button class="nav-btn" id="btnPrev" onclick="go(-1)">←</button>
+  <span class="nav-counter" id="counter">1 / 10</span>
+  <button class="nav-btn" id="btnNext" onclick="go(1)">→</button>
+</nav>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let cur = 0;
+
+function show(n){
+  slides[cur].classList.remove('active');
+  cur = Math.max(0, Math.min(total-1, n));
+  slides[cur].classList.add('active');
+  document.getElementById('counter').textContent = (cur+1) + ' / ' + total;
+  document.getElementById('progress').style.width = ((cur+1)/total*100) + '%';
+}
+
+function go(d){ show(cur+d); }
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') go(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') go(-1);
+});
+
+// Swipe
+let tx=0;
+document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>50) go(dx<0?1:-1);
+});
+
+show(0);
+</script>
+</body>
+</html>
