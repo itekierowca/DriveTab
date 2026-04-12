@@ -372,7 +372,7 @@
     <div class="form-row">
       <label>Imię i nazwisko kandydata</label>
       <div style="display:flex;gap:8px">
-        <input id="f-kandydat" type="text" placeholder="Jan Bukowiec" value="Jan Bukowiec" style="flex:1">
+        <input id="f-kandydat" type="text" placeholder="Jan Kowalski" value="Jan Kowalski" style="flex:1">
         <button type="button" onclick="openScannerQR()" style="padding:0 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--accent);font-size:1.1rem;cursor:pointer;flex-shrink:0" title="Skanuj QR kandydata">⬛</button>
       </div>
     </div>
@@ -393,7 +393,7 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="form-row" style="margin:0">
         <label>Egzaminator</label>
-        <input id="f-egzaminator" type="text" placeholder="Tomasz Matuszewski" value="Tomasz Matuszewski">
+        <input id="f-egzaminator" type="text" placeholder="Rafał Matuszak" value="Rafał Matuszak">
       </div>
       <div class="form-row" style="margin:0">
         <label>Nr uprawnień</label>
@@ -403,7 +403,7 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="form-row" style="margin:0">
         <label>WORD</label>
-        <input id="f-word" type="text" value="WORD Warszawa">
+        <input id="f-word" type="text" value="WORD Nakło">
       </div>
       <div class="form-row" style="margin:0">
         <label>Pojazd</label>
@@ -1928,6 +1928,100 @@ function generatePDF(){
     '</div>',
 
     '</body>',
+
+    // ── METADANE SESJI (niewidoczne przy druku, dostępne w źródle HTML) ──
+    '<!--DRIVETAB_SESSION_DATA',
+    JSON.stringify({
+      _wersja: 'DriveTab v1.0',
+      _format: 'DriveTab Session Audit Log',
+      _opis: 'Dane diagnostyczne sesji egzaminu — niewidoczne przy druku',
+      _wygenerowano: new Date().toISOString(),
+
+      kandydat: {
+        imie_nazwisko: m.kandydat,
+        pesel: m.pesel || null,
+        pkk: m.pkk,
+      },
+      egzaminator: {
+        imie_nazwisko: m.egzaminator,
+        nr_uprawnien: m.nrEg,
+        word: m.word,
+      },
+      egzamin: {
+        data: m.data,
+        godzina_start: m.godzina,
+        czas_trwania_min: Math.round(((m.tsEnd||Date.now()) - (m.tsStart||Date.now()))/60000),
+        ts_start_iso: m.tsStart ? new Date(m.tsStart).toISOString() : null,
+        ts_end_iso: m.tsEnd   ? new Date(m.tsEnd).toISOString()   : null,
+        wynik: state.verdict,
+        stop_reason: state.stopReason || null,
+        stop_powody: state.stopPowody || [],
+        pojazd: m.pojazd,
+      },
+
+      hp: state.hp.done ? {
+        przeprowadzony: true,
+        klipy: state.hp.clips.map(cl => ({
+          nazwa: cl.name,
+          plik: cl.file,
+          grupa: cl.group,
+          okno1: { start: cl.winStart, end: cl.winEnd },
+          okno2: cl.winStart2 != null ? { start: cl.winStart2, end: cl.winEnd2 } : null,
+          tapniecia: cl.hits.map(h => ({
+            czas_s: h.t,
+            punkty: h.pts,
+            okno: h.win || null,
+          })),
+          max_pkt: cl.winStart2 != null ? 10 : 5,
+          wynik_pkt: cl.hits.filter(h=>h.win!==2).reduce((mx,h)=>Math.max(mx,h.pts||0),0)
+                   + cl.hits.filter(h=>h.win===2).reduce((mx,h)=>Math.max(mx,h.pts||0),0),
+        })),
+        suma_punktow: state.hp.clips.reduce((s,cl)=>
+          s + cl.hits.filter(h=>h.win!==2).reduce((mx,h)=>Math.max(mx,h.pts||0),0)
+            + cl.hits.filter(h=>h.win===2).reduce((mx,h)=>Math.max(mx,h.pts||0),0), 0),
+        max_punktow: 30,
+      } : { przeprowadzony: false },
+
+      zadanie_1_prep: {
+        losowane: PREP_ITEMS.map(p => ({
+          id: p.id, label: p.label,
+          bledy: state.plac['prep_'+p.id]?.count || 0,
+          zaliczone: state.plac['prep_'+p.id]?.done || false,
+        })),
+        stale: PREP_STALE.map(p => ({
+          id: p.id, label: p.label,
+          bledy: state.plac['prep_'+p.id]?.count || 0,
+          zaliczone: state.plac['prep_'+p.id]?.done || false,
+        })),
+      },
+
+      zadanie_2_plac: PLAC_TASKS.map(t => ({
+        id: t.id, nazwa: t.name,
+        bledy: state.plac[t.id]?.count || 0,
+        zaliczone: state.plac[t.id]?.done || false,
+        negatywny: (state.plac[t.id]?.count || 0) >= 2,
+      })),
+
+      zadanie_3_wzniesienie: WZNIESIENIE_ITEMS.map(p => ({
+        id: p.id, label: p.label,
+        bledy: state.wzn[p.id]?.count || 0,
+        zaliczone: state.wzn[p.id]?.done || false,
+      })),
+
+      ruch_drogowy: RUCH_ERRORS.map(e => ({
+        id: e.id, label: e.label,
+        bledy: state.ruch[e.id]?.count || 0,
+        zaliczone: state.ruch[e.id]?.done || false,
+        negatywny: (state.ruch[e.id]?.count || 0) >= 2,
+      })),
+
+      czynnosci_wstepne: PRE_ITEMS.map(p => ({
+        id: p.id, label: p.label,
+        zaznaczone: state.pre?.[p.id] || false,
+      })),
+    }, null, 2),
+    'DRIVETAB_SESSION_DATA-->',
+
     '</html>'
   ].join('');
 
