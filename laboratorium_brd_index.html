@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorium BRD — System Danych Egzaminacyjnych</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1A1410;
+  --ink2:#3D3530;
+  --muted:#8A7E76;
+  --bg:#F7F3EE;
+  --bg2:#EDE8E0;
+  --white:#FFFFFF;
+  --red:#C2341E;
+  --red2:#9E2515;
+  --teal:#1A7A6A;
+  --teal2:#145C50;
+  --gold:#B87A1A;
+  --border:rgba(26,20,16,.1);
+  --border2:rgba(26,20,16,.18);
+  --r:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;font-size:16px}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(247,243,238,.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:0 5vw;display:flex;align-items:center;justify-content:space-between;height:60px;
+}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:.5em}
+.nav-logo .dot{width:8px;height:8px;background:var(--red);border-radius:50%}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{color:var(--ink2);text-decoration:none;font-size:.875rem;font-weight:400;transition:color .2s}
+.nav-links a:hover{color:var(--red)}
+.nav-login{
+  background:var(--ink);color:var(--white);border:none;
+  padding:.45em 1.2em;border-radius:6px;font-family:'DM Sans',sans-serif;
+  font-size:.875rem;font-weight:500;cursor:pointer;transition:background .2s;
+  text-decoration:none;display:inline-flex;align-items:center;gap:.4em;
+}
+.nav-login:hover{background:var(--red)}
+
+/* ── HERO ── */
+.hero{
+  min-height:90vh;display:flex;align-items:center;
+  padding:8vw 5vw 6vw;position:relative;overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 80% 30%, rgba(26,122,106,.06) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 10% 80%, rgba(194,52,30,.04) 0%, transparent 60%);
+  pointer-events:none;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:80px 80px;opacity:.4;pointer-events:none;
+}
+.hero-inner{max-width:1100px;width:100%;margin:0 auto;position:relative;z-index:1}
+.hero-label{
+  display:inline-flex;align-items:center;gap:.5em;
+  font-size:.75rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);
+  border:1px solid rgba(26,122,106,.25);background:rgba(26,122,106,.06);
+  padding:.35em 1em;border-radius:2em;margin-bottom:2em;
+}
+.hero h1{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(2.8rem,6vw,6rem);
+  line-height:1.0;letter-spacing:-.02em;
+  color:var(--ink);margin-bottom:.6em;
+}
+.hero h1 em{font-style:italic;color:var(--red)}
+.hero-lead{
+  font-size:clamp(1rem,1.8vw,1.2rem);font-weight:300;
+  color:var(--ink2);max-width:55ch;line-height:1.8;margin-bottom:2.5em;
+}
+.hero-actions{display:flex;gap:1em;flex-wrap:wrap;align-items:center}
+.btn-primary{
+  background:var(--red);color:white;border:none;padding:.8em 2em;
+  border-radius:7px;font-family:'DM Sans',sans-serif;font-size:1rem;
+  font-weight:500;cursor:pointer;transition:background .2s;text-decoration:none;
+  display:inline-flex;align-items:center;gap:.5em;
+}
+.btn-primary:hover{background:var(--red2)}
+.btn-secondary{
+  background:transparent;color:var(--ink);border:1px solid var(--border2);
+  padding:.8em 2em;border-radius:7px;font-family:'DM Sans',sans-serif;
+  font-size:1rem;font-weight:400;cursor:pointer;transition:all .2s;text-decoration:none;
+  display:inline-flex;align-items:center;gap:.5em;
+}
+.btn-secondary:hover{background:var(--bg2)}
+.hero-stats{
+  display:flex;gap:3em;margin-top:4em;flex-wrap:wrap;
+  padding-top:2em;border-top:1px solid var(--border);
+}
+.hero-stat-val{font-family:'DM Serif Display',serif;font-size:2.2rem;color:var(--ink)}
+.hero-stat-label{font-size:.8rem;color:var(--muted);font-weight:400;margin-top:.2em}
+
+/* ── SECTIONS ── */
+section{padding:6vw 5vw}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-label{
+  font-size:.72rem;font-weight:500;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:1.2em;
+}
+.section-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.8rem,3.5vw,3rem);line-height:1.1;
+  letter-spacing:-.01em;margin-bottom:1em;
+}
+.section-lead{font-size:1.05rem;font-weight:300;color:var(--ink2);max-width:60ch;line-height:1.8;margin-bottom:3em}
+
+/* ── UPLOAD SECTION ── */
+#upload{background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:4vw;align-items:start}
+.upload-zone{
+  border:2px dashed var(--border2);border-radius:var(--r);
+  padding:3em 2em;text-align:center;cursor:pointer;
+  transition:all .25s;background:var(--bg);
+}
+.upload-zone:hover{border-color:var(--teal);background:rgba(26,122,106,.04)}
+.upload-zone.dragging{border-color:var(--teal);background:rgba(26,122,106,.08)}
+.upload-icon{
+  width:52px;height:52px;background:var(--bg2);border-radius:12px;
+  margin:0 auto 1.2em;display:flex;align-items:center;justify-content:center;
+}
+.upload-icon svg{width:24px;height:24px;stroke:var(--teal);fill:none;stroke-width:1.5;stroke-linecap:round}
+.upload-title{font-weight:500;font-size:1rem;margin-bottom:.4em}
+.upload-sub{font-size:.85rem;color:var(--muted);line-height:1.6}
+.upload-formats{
+  display:flex;gap:.5em;justify-content:center;margin-top:1.2em;flex-wrap:wrap;
+}
+.format-tag{
+  background:var(--bg2);color:var(--ink2);font-size:.72rem;font-weight:500;
+  letter-spacing:.05em;padding:.3em .8em;border-radius:4px;
+}
+.upload-status{
+  margin-top:1.5em;padding:1em 1.2em;border-radius:8px;
+  background:rgba(26,122,106,.08);border:1px solid rgba(26,122,106,.2);
+  font-size:.875rem;color:var(--teal2);display:none;
+}
+.upload-status.visible{display:block}
+
+.info-cards{display:flex;flex-direction:column;gap:1em}
+.info-card{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--r);
+  padding:1.2em 1.4em;display:flex;gap:1em;align-items:flex-start;
+}
+.info-card-num{
+  width:28px;height:28px;background:var(--ink);color:white;
+  border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:500;flex-shrink:0;margin-top:.1em;
+}
+.info-card-title{font-weight:500;font-size:.9rem;margin-bottom:.25em}
+.info-card-body{font-size:.825rem;color:var(--ink2);line-height:1.65}
+
+/* ── LOGIN SECTION ── */
+#login{background:var(--bg2)}
+.login-grid{display:grid;grid-template-columns:1fr 1fr;gap:4vw;align-items:start}
+.login-panel{
+  background:var(--white);border:1px solid var(--border);border-radius:14px;
+  padding:2em;
+}
+.login-panel-title{font-weight:500;font-size:1rem;margin-bottom:.3em;display:flex;align-items:center;gap:.5em}
+.login-badge{
+  font-size:.68rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  padding:.2em .6em;border-radius:3px;
+}
+.badge-word{background:#E6F1FB;color:#185FA5}
+.badge-osk{background:#EAF3DE;color:#3B6D11}
+.badge-mi{background:#FAEEDA;color:#854F0B}
+.form-group{margin-bottom:1.2em}
+.form-label{font-size:.8rem;font-weight:500;color:var(--ink2);margin-bottom:.4em;display:block}
+.form-input{
+  width:100%;padding:.65em 1em;border:1px solid var(--border2);border-radius:7px;
+  font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--ink);
+  background:var(--bg);transition:border-color .2s;outline:none;
+}
+.form-input:focus{border-color:var(--teal)}
+.form-input::placeholder{color:var(--muted)}
+.btn-login{
+  width:100%;padding:.75em;background:var(--ink);color:white;border:none;
+  border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.9rem;
+  font-weight:500;cursor:pointer;transition:background .2s;
+}
+.btn-login:hover{background:var(--red)}
+.login-note{font-size:.75rem;color:var(--muted);text-align:center;margin-top:1em;line-height:1.6}
+.panel-preview{
+  background:var(--bg);border:1px solid var(--border);border-radius:12px;
+  padding:1.5em;
+}
+.panel-preview-title{font-size:.75rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2em}
+.preview-stat{display:flex;justify-content:space-between;align-items:center;padding:.6em 0;border-bottom:1px solid var(--border)}
+.preview-stat:last-child{border-bottom:none}
+.preview-stat-label{font-size:.85rem;color:var(--ink2)}
+.preview-stat-val{font-size:.85rem;font-weight:500;color:var(--ink)}
+.preview-chart{height:80px;background:var(--bg2);border-radius:8px;margin-top:1em;display:flex;align-items:flex-end;padding:8px;gap:6px;overflow:hidden}
+.preview-bar{flex:1;background:var(--teal);border-radius:3px 3px 0 0;opacity:.7;transition:opacity .2s}
+.preview-bar:hover{opacity:1}
+
+/* ── RODO SECTION ── */
+#rodo{background:var(--white);border-top:1px solid var(--border)}
+.rodo-grid{display:grid;grid-template-columns:1fr 1fr;gap:4vw;align-items:start}
+.rodo-card{
+  background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1.8em;
+}
+.rodo-card-icon{
+  width:40px;height:40px;border-radius:10px;margin-bottom:1em;
+  display:flex;align-items:center;justify-content:center;
+}
+.rodo-card h3{font-family:'DM Serif Display',serif;font-size:1.2rem;margin-bottom:.5em}
+.rodo-card p{font-size:.875rem;color:var(--ink2);line-height:1.75}
+.rodo-highlight{
+  background:rgba(194,52,30,.05);border:1px solid rgba(194,52,30,.15);
+  border-radius:10px;padding:1.5em;margin-top:2em;
+}
+.rodo-highlight p{font-size:.875rem;line-height:1.75;color:var(--ink2)}
+.rodo-flow{display:flex;flex-direction:column;gap:0}
+.rodo-step{
+  display:flex;gap:1em;padding:1em 0;
+  border-bottom:1px solid var(--border);position:relative;
+}
+.rodo-step:last-child{border-bottom:none}
+.rodo-step-num{
+  width:32px;height:32px;background:var(--ink);color:white;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;font-weight:500;flex-shrink:0;
+}
+.rodo-step-title{font-weight:500;font-size:.9rem;margin-bottom:.25em}
+.rodo-step-body{font-size:.825rem;color:var(--ink2);line-height:1.65}
+.rodo-step-tag{
+  display:inline-block;font-size:.68rem;padding:.2em .6em;border-radius:3px;
+  font-weight:500;margin-top:.4em;
+}
+.tag-local{background:#EAF3DE;color:#3B6D11}
+.tag-anon{background:#E6F1FB;color:#185FA5}
+.tag-pseudo{background:#FAEEDA;color:#854F0B}
+
+/* ── FAQ ── */
+#faq{background:var(--bg)}
+.faq-list{max-width:760px}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{
+  width:100%;text-align:left;padding:1.2em 0;background:none;border:none;
+  font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;
+  color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;
+  align-items:center;gap:1em;
+}
+.faq-q:hover{color:var(--red)}
+.faq-chevron{width:18px;height:18px;flex-shrink:0;transition:transform .25s;color:var(--muted)}
+.faq-a{
+  max-height:0;overflow:hidden;transition:max-height .3s ease;
+  font-size:.875rem;color:var(--ink2);line-height:1.8;
+}
+.faq-a.open{max-height:300px}
+.faq-a-inner{padding-bottom:1.2em}
+.faq-item.open .faq-chevron{transform:rotate(180deg)}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--ink);color:rgba(255,255,255,.6);
+  padding:3em 5vw;
+}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5em}
+.footer-logo{font-family:'DM Serif Display',serif;font-size:1rem;color:white}
+.footer-links{display:flex;gap:2em}
+.footer-links a{color:rgba(255,255,255,.5);text-decoration:none;font-size:.825rem;transition:color .2s}
+.footer-links a:hover{color:white}
+.footer-legal{font-size:.75rem;color:rgba(255,255,255,.35);margin-top:.5em}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .upload-grid,.login-grid,.rodo-grid{grid-template-columns:1fr}
+  .hero-stats{gap:2em}
+  .nav-links{display:none}
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.hero-label{animation:fadeUp .6s .1s both}
+.hero h1{animation:fadeUp .6s .2s both}
+.hero-lead{animation:fadeUp .6s .3s both}
+.hero-actions{animation:fadeUp .6s .4s both}
+.hero-stats{animation:fadeUp .6s .5s both}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══════════════════════════════════════════════════════════ -->
+<nav>
+  <a class="nav-logo" href="#">
+    <span class="dot"></span>
+    Laboratorium BRD
+  </a>
+  <div class="nav-links">
+    <a href="#upload">Prześlij dane</a>
+    <a href="#login">Panel WORD / OSK</a>
+    <a href="#rodo">Bezpieczeństwo</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a class="nav-login" href="#login">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h6v18h-6M10 17l5-5-5-5M15 12H3"/></svg>
+    Zaloguj się
+  </a>
+</nav>
+
+<!-- ══ HERO ═══════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-label">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="2" fill="currentColor"/></svg>
+      Stowarzyszenie Kierowca.pl · pilotaż 2026
+    </div>
+    <h1>Dane które<br><em>łączą szkolenie</em><br>z bezpieczeństwem</h1>
+    <p class="hero-lead">Laboratorium BRD to neutralny pośrednik między OSK a WORD. Zbieramy zanonimizowane dane z egzaminów DriveTab i zwracamy instytucjom wiedzę o jakości szkolenia kierowców.</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#upload">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        Prześlij dane egzaminów
+      </a>
+      <a class="btn-secondary" href="#login">
+        Wejdź w panel analityczny →
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-val">847</div>
+        <div class="hero-stat-label">sesji w pilotażu</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">12</div>
+        <div class="hero-stat-label">WORDów uczestniczących</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">61%</div>
+        <div class="hero-stat-label">śr. zdawalność vs. 58% krajowa</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">0 zł</div>
+        <div class="hero-stat-label">koszt dla instytucji</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ UPLOAD ════════════════════════════════════════════════════ -->
+<section id="upload">
+  <div class="section-inner">
+    <div class="section-label">Krok 1</div>
+    <h2 class="section-title">Prześlij dane z DriveTab</h2>
+    <p class="section-lead">Wgraj pliki wygenerowane przez aplikację DriveTab po zakończeniu egzaminu. PDF trafia do Twojego archiwum, JSON jest anonimizowany i zasila bazę badawczą.</p>
+
+    <div class="upload-grid">
+      <div>
+        <div class="upload-zone" id="drop-zone"
+          ondragover="event.preventDefault();this.classList.add('dragging')"
+          ondragleave="this.classList.remove('dragging')"
+          ondrop="handleDrop(event)"
+          onclick="document.getElementById('file-input').click()">
+          <div class="upload-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="upload-title">Przeciągnij pliki lub kliknij tutaj</div>
+          <div class="upload-sub">Możesz wgrać wiele plików jednocześnie.<br>Dane osobowe nigdy nie opuszczają Twojego urządzenia.</div>
+          <div class="upload-formats">
+            <span class="format-tag">.html</span>
+            <span class="format-tag">.json</span>
+            <span class="format-tag">arkusz DriveTab</span>
+          </div>
+        </div>
+        <input type="file" id="file-input" multiple accept=".html,.json" style="display:none" onchange="handleFiles(this.files)">
+        <div class="upload-status" id="upload-status"></div>
+      </div>
+
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="info-card-num">1</div>
+          <div>
+            <div class="info-card-title">PDF zostaje u Ciebie</div>
+            <div class="info-card-body">Plik PDF z arkuszem egzaminu, podpisem i timestampem trafia wyłącznie do Twojego archiwum lokalnego. Dane osobowe kandydata (imię, PESEL, PKK) nigdy nie opuszczają Twojej instytucji.</div>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-num">2</div>
+          <div>
+            <div class="info-card-title">JSON jest anonimizowany</div>
+            <div class="info-card-body">Z pliku JSON usuwane są wszystkie dane identyfikujące. PESEL jest zastępowany jednokierunkowym hashem kryptograficznym — niemożliwym do odwrócenia bez znajomości sekretu systemowego.</div>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-num">3</div>
+          <div>
+            <div class="info-card-title">Dane behawioralne do bazy BRD</div>
+            <div class="info-card-body">Czasy reakcji HP, profil błędów, czas egzaminu — bez nazwy kandydata — zasilają bazę badawczą. W zamian Twoja instytucja otrzymuje dostęp do panelu analitycznego z benchmarkiem.</div>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-num">4</div>
+          <div>
+            <div class="info-card-title">Raport zwrotny w ciągu 24h</div>
+            <div class="info-card-body">Po przetworzeniu danych dashboard analityczny Twojej instytucji jest automatycznie aktualizowany. Benchmark, profil błędów i wyniki HP dostępne od razu.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ LOGIN ════════════════════════════════════════════════════ -->
+<section id="login">
+  <div class="section-inner">
+    <div class="section-label">Krok 2</div>
+    <h2 class="section-title">Panel analityczny</h2>
+    <p class="section-lead">Zaloguj się aby uzyskać dostęp do dashboardu swojej instytucji — benchmarku, profilu błędów kandydatów i wyników testu HP.</p>
+
+    <div class="login-grid">
+      <div style="display:flex;flex-direction:column;gap:1.2em">
+        <div class="login-panel">
+          <div class="login-panel-title">
+            Logowanie
+            <span class="login-badge badge-word">WORD</span>
+            <span class="login-badge badge-osk">OSK</span>
+            <span class="login-badge badge-mi">MI</span>
+          </div>
+          <div style="height:.5em"></div>
+          <div class="form-group">
+            <label class="form-label">Kod instytucji</label>
+            <input class="form-input" type="text" placeholder="np. WORD-07 lub OSK-1234" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hasło</label>
+            <input class="form-input" type="password" placeholder="••••••••">
+          </div>
+          <button class="btn-login" onclick="mockLogin()">Wejdź w panel →</button>
+          <div class="login-note">
+            Pierwsze logowanie? Skontaktuj się z Laboratorium BRD.<br>
+            <a href="mailto:rafal.matuszak@kierowca.pl" style="color:var(--teal)">rafal.matuszak@kierowca.pl</a>
+          </div>
+        </div>
+        <div style="background:rgba(194,52,30,.05);border:1px solid rgba(194,52,30,.15);border-radius:10px;padding:1.2em 1.4em">
+          <div style="font-size:.8rem;font-weight:500;color:var(--red);margin-bottom:.4em">Pilotaż 2026 — dostęp ograniczony</div>
+          <div style="font-size:.8rem;color:var(--ink2);line-height:1.7">W fazie pilotażu konta są zakładane ręcznie przez Laboratorium BRD. Napisz do nas — otrzymasz kod instytucji i hasło w ciągu 24 godzin.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel-preview">
+          <div class="panel-preview-title">Podgląd panelu WORD — dane demonstracyjne</div>
+          <div class="preview-stat">
+            <span class="preview-stat-label">Sesji w pilotażu</span>
+            <span class="preview-stat-val">847</span>
+          </div>
+          <div class="preview-stat">
+            <span class="preview-stat-label">Zdawalność kat. B</span>
+            <span class="preview-stat-val" style="color:var(--teal)">61% <span style="font-size:.75rem;color:var(--muted)">+3pp vs. kraj</span></span>
+          </div>
+          <div class="preview-stat">
+            <span class="preview-stat-label">Śr. wynik HP</span>
+            <span class="preview-stat-val">17.4 / 30</span>
+          </div>
+          <div class="preview-stat">
+            <span class="preview-stat-label">Pozycja w benchmarku</span>
+            <span class="preview-stat-val" style="color:var(--teal)">#4 / 12 WORDów</span>
+          </div>
+          <div class="preview-stat">
+            <span class="preview-stat-label">Top błąd ruchowy</span>
+            <span class="preview-stat-val" style="color:var(--red)">Pierwszeństwo pieszych</span>
+          </div>
+          <div class="preview-chart" id="preview-chart">
+            <div class="preview-bar" style="height:55%" title="lis"></div>
+            <div class="preview-bar" style="height:57%" title="gru"></div>
+            <div class="preview-bar" style="height:59%" title="sty"></div>
+            <div class="preview-bar" style="height:58%" title="lut"></div>
+            <div class="preview-bar" style="height:61%" title="mar"></div>
+            <div class="preview-bar" style="height:65%;opacity:1;background:var(--red)" title="kwi"></div>
+          </div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:.5em">Zdawalność — ostatnie 6 miesięcy</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RODO ══════════════════════════════════════════════════════ -->
+<section id="rodo">
+  <div class="section-inner">
+    <div class="section-label">Bezpieczeństwo danych</div>
+    <h2 class="section-title">Jak chronimy dane kandydatów</h2>
+    <p class="section-lead">Architektura systemu jest zaprojektowana tak, aby dane osobowe nigdy nie opuszczały instytucji która je zebrała. Laboratorium BRD przetwarza wyłącznie dane zanonimizowane i pseudonimizowane.</p>
+
+    <div class="rodo-grid">
+      <div>
+        <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1.5em">Przepływ danych krok po kroku</h3>
+        <div class="rodo-flow">
+          <div class="rodo-step">
+            <div class="rodo-step-num">1</div>
+            <div>
+              <div class="rodo-step-title">Egzamin w DriveTab</div>
+              <div class="rodo-step-body">Dane kandydata (imię, PESEL, PKK) wprowadzane są lokalnie na urządzeniu egzaminatora. Plik PDF generowany jest na urządzeniu — nigdy nie jest przesyłany do zewnętrznych serwerów.</div>
+              <span class="rodo-step-tag tag-local">zostaje lokalnie</span>
+            </div>
+          </div>
+          <div class="rodo-step">
+            <div class="rodo-step-num">2</div>
+            <div>
+              <div class="rodo-step-title">Anonimizacja przed wysyłką</div>
+              <div class="rodo-step-body">Przed przesłaniem do Laboratorium BRD z pliku JSON usuwane są: imię i nazwisko, PESEL, PKK, dane egzaminatora. Pozostają wyłącznie dane behawioralne (czasy, błędy, wyniki HP).</div>
+              <span class="rodo-step-tag tag-anon">anonimizacja</span>
+            </div>
+          </div>
+          <div class="rodo-step">
+            <div class="rodo-step-num">3</div>
+            <div>
+              <div class="rodo-step-title">Hash pseudonimizacji</div>
+              <div class="rodo-step-body">PESEL jest zastępowany jednokierunkowym hashem SHA-256 z sekretem systemowym. Ten sam kandydat w OSK i WORD dostaje ten sam hash — co umożliwia łączenie ścieżki edukacyjnej bez ujawniania tożsamości.</div>
+              <span class="rodo-step-tag tag-pseudo">pseudonimizacja · art. 89 RODO</span>
+            </div>
+          </div>
+          <div class="rodo-step">
+            <div class="rodo-step-num">4</div>
+            <div>
+              <div class="rodo-step-title">Baza badawcza Laboratorium BRD</div>
+              <div class="rodo-step-body">Laboratorium BRD przechowuje wyłącznie dane zanonimizowane. Klucz odwracający hash (sekret systemowy) jest przechowywany oddzielnie i niedostępny dla badaczy ani partnerów zewnętrznych.</div>
+              <span class="rodo-step-tag tag-pseudo">cel badań naukowych</span>
+            </div>
+          </div>
+          <div class="rodo-step">
+            <div class="rodo-step-num">5</div>
+            <div>
+              <div class="rodo-step-title">Raport zwrotny do instytucji</div>
+              <div class="rodo-step-body">Wyniki analiz — benchmark, profil błędów, trendy — dostępne są wyłącznie dla instytucji która przesłała dane. Dane zagregowane nie pozwalają na identyfikację żadnego indywidualnego kandydata.</div>
+              <span class="rodo-step-tag tag-anon">zagregowane · nieosobowe</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:1.2em">
+        <div class="rodo-card">
+          <div class="rodo-card-icon" style="background:rgba(26,122,106,.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Podstawa prawna</h3>
+          <p>Przetwarzanie danych do celów badań naukowych i statystycznych jest dopuszczone na podstawie <strong>art. 89 ust. 1 RODO</strong>, pod warunkiem zastosowania odpowiednich zabezpieczeń technicznych i organizacyjnych, w tym pseudonimizacji.</p>
+        </div>
+        <div class="rodo-card">
+          <div class="rodo-card-icon" style="background:rgba(184,122,26,.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <h3>Szyfrowanie i przechowywanie</h3>
+          <p>Dane przesyłane są przez szyfrowane połączenie HTTPS. Baza danych Laboratorium BRD jest szyfrowana at-rest. Sekret systemowy pseudonimizacji przechowywany jest w izolowanym module, oddzielnie od bazy danych.</p>
+        </div>
+        <div class="rodo-card">
+          <div class="rodo-card-icon" style="background:rgba(194,52,30,.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <h3>Prawa kandydatów</h3>
+          <p>Kandydaci objęci są klauzulą informacyjną WORD lub OSK, która informuje o możliwości przetwarzania zanonimizowanych danych behawioralnych do celów BRD. Prawo do bycia zapomnianym realizowane jest przez usunięcie hashu z bazy (dane osobowe pozostają niezmienione w archiwum instytucji).</p>
+        </div>
+        <div class="rodo-highlight">
+          <div style="font-size:.8rem;font-weight:500;color:var(--red);margin-bottom:.5em">Kluczowa zasada systemu</div>
+          <p>Laboratorium BRD <strong>nigdy nie może zidentyfikować konkretnego kandydata</strong> na podstawie danych które posiada. Jedyną osobą która może powiązać hash z tożsamością jest administrator danych pierwotnych — WORD lub OSK — dysponujący kluczem odwracającym.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ═══════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="section-inner">
+    <div class="section-label">Pytania i odpowiedzi</div>
+    <h2 class="section-title">Najczęstsze pytania</h2>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Czy udział w programie jest obowiązkowy?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Nie. Udział jest w pełni dobrowolny zarówno dla WORD jak i dla OSK. Instytucja decyduje samodzielnie czy i kiedy przesyła dane do Laboratorium BRD. Aplikacja DriveTab działa lokalnie niezależnie od uczestnictwa w programie wymiany danych.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Co dokładnie jest przesyłane do Laboratorium BRD?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Do Laboratorium BRD trafiają wyłącznie dane behawioralne: czasy tapnięć w teście HP, liczba błędów per zadanie, czas trwania każdej fazy egzaminu, wynik ogólny, kod WORD, data egzaminu oraz hash pseudonimizacji. Imię, nazwisko, PESEL, PKK i dane egzaminatora nigdy nie są przesyłane.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Jak działa hash pseudonimizacji i dlaczego jest bezpieczny?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Hash jest wynikiem funkcji SHA-256 zastosowanej do połączenia PESELu z tajnym ciągiem znaków (sekretem systemowym), który jest znany wyłącznie Laboratorium BRD. Bez znajomości sekretu niemożliwe jest odtworzenie PESELu z hashu — nawet jeśli ktoś posiada całą bazę danych Laboratorium BRD. Ten mechanizm jest zgodny z definicją pseudonimizacji z art. 4 pkt 5 RODO.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Czy dane OSK i WORD są widoczne dla siebie nawzajem?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Nie. Każda instytucja widzi wyłącznie swoje własne dane oraz zagregowane statystyki porównawcze (benchmark). W benchmarku inne instytucje są oznaczone anonimowymi kodami — WORD-03, OSK-1247 — bez ujawniania nazwy. Dane indywidualnych kandydatów nie są nigdy dostępne dla innych instytucji.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Jak długo dane są przechowywane w Laboratorium BRD?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Dane zanonimizowane są przechowywane przez okres niezbędny do celów badawczych, jednak nie dłużej niż 10 lat od daty egzaminu. Instytucja może w każdej chwili wnioskować o usunięcie danych swojej kohorty — zostanie zrealizowane w ciągu 30 dni.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Czy wymagana jest zgoda kandydata?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Zgodnie z art. 89 RODO, przetwarzanie danych do celów badań naukowych nie wymaga dodatkowej zgody jeśli dane były pierwotnie zebrane w legalnym celu. Wymagane jest natomiast spełnienie obowiązku informacyjnego — WORD lub OSK informuje kandydata w klauzuli informacyjnej że zanonimizowane dane behawioralne mogą być przetwarzane do celów BRD. Kandydat ma prawo sprzeciwu.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Jaki sprzęt jest potrzebny do korzystania z DriveTab?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">DriveTab działa jako aplikacja webowa — wystarczy dowolna nowoczesna przeglądarka. Etap 1 pilotażu (bez testu HP) działa na zwykłym smartfonie. Etap 2 (z testem HP) wymaga tabletu lub iPada ze względu na wyświetlanie klipów wideo. Nie jest wymagana instalacja żadnego oprogramowania ani integracja z SIWORD.</div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Laboratorium BRD</div>
+      <div class="footer-legal">Stowarzyszenie Kierowca.pl · NIP: · KRS: · Szczecin</div>
+    </div>
+    <div class="footer-links">
+      <a href="#">Polityka prywatności</a>
+      <a href="#">RODO · klauzula informacyjna</a>
+      <a href="mailto:rafal.matuszak@kierowca.pl">Kontakt</a>
+      <a href="https://drivetab.netlify.app">DriveTab →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('dragging');
+  handleFiles(e.dataTransfer.files);
+}
+
+function handleFiles(files){
+  if(!files.length) return;
+  const st = document.getElementById('upload-status');
+  st.className = 'upload-status visible';
+  st.style.background = 'rgba(184,122,26,.08)';
+  st.style.borderColor = 'rgba(184,122,26,.2)';
+  st.style.color = 'var(--gold)';
+  st.innerHTML = 'Przetwarzanie ' + files.length + ' pliku/ów...';
+  let ok = 0, anon = 0;
+  Array.from(files).forEach(f => { if(f.name.endsWith('.html')) ok++; else if(f.name.endsWith('.json')) anon++; });
+  setTimeout(() => {
+    st.style.background = 'rgba(26,122,106,.08)';
+    st.style.borderColor = 'rgba(26,122,106,.2)';
+    st.style.color = 'var(--teal2)';
+    st.innerHTML = '✓ Przesłano ' + files.length + ' pliku/ów'
+      + (ok ? ' · ' + ok + ' PDF zarchiwizowanych lokalnie' : '')
+      + (anon ? ' · ' + anon + ' JSON zanonimizowanych i przekazanych do bazy BRD' : '')
+      + ' · Dashboard zaktualizowany.';
+  }, 1600);
+}
+
+function mockLogin(){
+  const btn = event.target;
+  btn.textContent = 'Logowanie...';
+  btn.style.background = 'var(--teal)';
+  setTimeout(() => {
+    btn.textContent = '✓ Przekierowanie do panelu WORD...';
+    setTimeout(() => {
+      btn.textContent = 'Wejdź w panel →';
+      btn.style.background = '';
+      alert('Panel analityczny — funkcja dostępna dla zarejestrowanych instytucji.\n\nSkontaktuj się: rafal.matuszak@kierowca.pl');
+    }, 1200);
+  }, 1000);
+}
+
+function toggleFaq(btn){
+  const item = btn.parentElement;
+  const ans  = item.querySelector('.faq-a');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => {
+    el.classList.remove('open');
+    el.querySelector('.faq-a').classList.remove('open');
+  });
+  if(!isOpen){ item.classList.add('open'); ans.classList.add('open'); }
+}
+</script>
+</body>
+</html>
