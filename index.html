@@ -719,38 +719,39 @@ const RUCH_ERRORS = [
 
 // Ścieżka do folderu z klipami — zmień jeśli przeniesiesz folder
 const HP_CLIPS = [
-  // ── Klipy bez grupy 17 — losowane swobodnie ──────────────────
-  { name:'Klip 01',  file:'klip01.mp4',  group:1,  winStart:19.33, winEnd:25 },
-  { name:'Klip 02',  file:'klip02.mp4',  group:2,  winStart:17.67, winEnd:24.33 },
-  { name:'Klip 03',  file:'klip03.mp4',  group:3,  winStart:16.33, winEnd:19.67 },
-  { name:'Klip 04',  file:'klip04.mp4',  group:4,  winStart:14.33, winEnd:17.67 },
-  { name:'Klip 05',  file:'klip05.mp4',  group:5,  winStart:18.33, winEnd:23.33 },
-  { name:'Klip 06',  file:'klip06.mp4',  group:6,  winStart:18.33, winEnd:23.33 },
-  { name:'Klip 07',  file:'klip07.mp4',  group:7,  winStart:15.33, winEnd:20 },
-  { name:'Klip 08',  file:'klip08.mp4',  group:8,  winStart:15.67, winEnd:22.33 },
-  { name:'Klip 10',  file:'klip10.mp4',  group:10, winStart:15.67, winEnd:20 },
-  { name:'Klip 14',  file:'klip14.mp4',  group:14, winStart:15.67, winEnd:18.67 },
-  { name:'Klip 15',  file:'klip15.mp4',  group:15, winStart:16,    winEnd:19.67 },
-  { name:'Klip 18',  file:'klip18.mp4',  group:18, winStart:18.33, winEnd:22.33 },
-  { name:'Klip 19',  file:'klip19.mp4',  group:19, winStart:12.67, winEnd:18 },
-  { name:'Klip 20',  file:'klip20.mp4',  group:20, winStart:18,    winEnd:21.67 },
-  { name:'Klip 21',  file:'klip21.mp4',  group:21, winStart:18.67, winEnd:23.33 },
-  { name:'Klip 22',  file:'klip22.mp4',  group:22, winStart:18,    winEnd:23.33 },
-  { name:'Klip 26',  file:'klip26.mp4',  group:26, winStart:15,    winEnd:20 },
-  { name:'Klip 29',  file:'klip29.mp4',  group:29, winStart:15,    winEnd:20 },
-  { name:'Klip 31',  file:'klip31.mp4',  group:31, winStart:17.67, winEnd:21 },
-  { name:'Klip 32',  file:'klip32.mp4',  group:32, winStart:20.07, winEnd:25.33 },
-  { name:'Klip 35',  file:'klip35.mp4',  group:35, winStart:27,    winEnd:30.33 },
-  { name:'Klip 36',  file:'klip36.mp4',  group:36, winStart:17.67, winEnd:22.67 },
-  { name:'Klip 43',  file:'klip43.mp4',  group:43, winStart:17,    winEnd:21 },
-  { name:'Klip 47',  file:'klip47.mp4',  group:47, winStart:14,    winEnd:18 },
-  // ── Grupa 17 — zawsze 1 z poniższych, zawsze dwa okna ────────
-  { name:'Klip 17',  file:'klip17.mp4',  group:17, winStart:23.33, winEnd:28,    winStart2:36, winEnd2:41.67 },
-  { name:'Klip 17A', file:'klip17A.mp4', group:17, winStart:23.33, winEnd:28,    winStart2:36, winEnd2:41.67 },
-  { name:'Klip 17B', file:'klip17B.mp4', group:17, winStart:23.33, winEnd:28,    winStart2:36, winEnd2:41.67 },
-  { name:'Klip 17C', file:'klip17C.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
-  { name:'Klip 17D', file:'klip17D.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
-  { name:'Klip 17E', file:'klip17E.mp4', group:17, winStart:20,    winEnd:25.33, winStart2:36, winEnd2:41.67 },
+  // Klipy standardowe — 1 okno, losowane
+  { name:'Klip 01',  file:'klip01.mp4',  group:1,  winStart:23.21, winEnd:30.06 },
+  { name:'Klip 02',  file:'klip02.mp4',  group:2,  winStart:21.17, winEnd:29.27 },
+  { name:'Klip 03',  file:'klip03.mp4',  group:3,  winStart:17.56, winEnd:21.58 },
+  { name:'Klip 04',  file:'klip04.mp4',  group:4,  winStart:15.22, winEnd:19.19 },
+  { name:'Klip 05',  file:'klip05.mp4',  group:5,  winStart:20.03, winEnd:25.98 },
+  { name:'Klip 06',  file:'klip06.mp4',  group:6,  winStart:20.08, winEnd:25.90 },
+  { name:'Klip 07',  file:'klip07.mp4',  group:7,  winStart:16.39, winEnd:21.96 },
+  { name:'Klip 08',  file:'klip08.mp4',  group:8,  winStart:16.82, winEnd:24.76 },
+  { name:'Klip 10',  file:'klip10.mp4',  group:10, winStart:16.80, winEnd:21.96 },
+  { name:'Klip 14',  file:'klip14.mp4',  group:14, winStart:16.79, winEnd:20.35 },
+  { name:'Klip 15',  file:'klip15.mp4',  group:15, winStart:17.16, winEnd:21.59 },
+  { name:'Klip 18',  file:'klip18.mp4',  group:18, winStart:19.87, winEnd:24.67 },
+  { name:'Klip 19',  file:'klip19.mp4',  group:19, winStart:13.15, winEnd:19.55 },
+  { name:'Klip 20',  file:'klip20.mp4',  group:20, winStart:19.55, winEnd:23.95 },
+  { name:'Klip 21',  file:'klip21.mp4',  group:21, winStart:20.35, winEnd:25.95 },
+  { name:'Klip 22',  file:'klip22.mp4',  group:22, winStart:19.55, winEnd:25.95 },
+  { name:'Klip 26',  file:'klip26.mp4',  group:26, winStart:15.95, winEnd:21.19 },
+  { name:'Klip 29',  file:'klip29.mp4',  group:29, winStart:15.95, winEnd:21.95 },
+  { name:'Klip 31',  file:'klip31.mp4',  group:31, winStart:17.95, winEnd:23.15 },
+  { name:'Klip 32',  file:'klip32.mp4',  group:32, winStart:24.03, winEnd:30.35 },
+  { name:'Klip 35',  file:'klip35.mp4',  group:35, winStart:26.35, winEnd:30.35 },
+  { name:'Klip 36',  file:'klip36.mp4',  group:36, winStart:21.15, winEnd:27.15 },
+  { name:'Klip 43',  file:'klip43.mp4',  group:43, winStart:20.35, winEnd:25.15 },
+  { name:'Klip 47',  file:'klip47.mp4',  group:47, winStart:14.75, winEnd:19.55 },
+  // Gr.17std — 1 okno (wchodzą do puli standardowej)
+  { name:'Klip 17',  file:'klip17.mp4',  group:'17std', winStart:27.95, winEnd:33.55 },
+  { name:'Klip 17A', file:'klip17A.mp4', group:'17std', winStart:27.95, winEnd:33.55 },
+  { name:'Klip 17B', file:'klip17B.mp4', group:'17std', winStart:27.95, winEnd:33.55 },
+  // Gr.17dual — 2 okna, zawsze 1 z tej trójki w zestawie (max 10 pkt)
+  { name:'Klip 17C', file:'klip17C.mp4', group:'17dual', winStart:13.95, winEnd:20.35, winStart2:33.15, winEnd2:39.95 },
+  { name:'Klip 17D', file:'klip17D.mp4', group:'17dual', winStart:13.95, winEnd:20.35, winStart2:33.15, winEnd2:39.95 },
+  { name:'Klip 17E', file:'klip17E.mp4', group:'17dual', winStart:13.95, winEnd:20.35, winStart2:33.15, winEnd2:39.95 },
 ];
 
 // Oblicz punkty za trafienie w oknie czasowym (obsługuje 2 okna)
@@ -901,17 +902,18 @@ function drawHPClips() {
     return a;
   }
 
-  // 1. Wylosuj 1 klip z grupy 17
-  const pool17   = HP_CLIPS.filter(c => c.group === 17);
-  const poolRest = HP_CLIPS.filter(c => c.group !== 17);
+  // 1. Wylosuj 1 klip z grupy 17dual (2 okna, max 10 pkt)
+  const poolDual = HP_CLIPS.filter(cl => cl.group === '17dual');
+  // 2. Pula standardowa: wszystkie pozostałe (w tym 17std z 1 oknem)
+  const poolStd  = HP_CLIPS.filter(cl => cl.group !== '17dual');
 
-  const klip17   = pool17[Math.floor(Math.random() * pool17.length)];
-  const rest4    = shuffle(poolRest).slice(0, 4);
+  const klipDual = poolDual[Math.floor(Math.random() * poolDual.length)];
+  const rest4    = shuffle(poolStd).slice(0, 4);
 
-  // 2. Połącz i przetasuj kolejność prezentacji
-  const selected = shuffle([klip17, ...rest4]);
+  // 3. Połącz i przetasuj kolejność prezentacji
+  const selected = shuffle([klipDual, ...rest4]);
 
-  return selected.map(c => ({...c, hits: [], done: false}));
+  return selected.map(cl => ({...cl, hits: [], done: false}));
 }
 
 function initHP(){
